@@ -53,7 +53,7 @@ fun SupplementsUi(){
     val navController= rememberNavController()
     KoinNavHost(
         navController=navController,
-        startDestination = MyScreens.SignUpScreen.route,
+        startDestination = MyScreens.IntroScreen.route,
     ){
         composable(MyScreens.MainScreen.route){
             MainScreen()
@@ -96,9 +96,7 @@ fun SupplementsUi(){
         composable(MyScreens.IntroScreen.route){
             IntroScreen()
         }
-//        composable("noInternetScreen"){
-//            noInternetScreen()
-//        }
+
     }
 
 }
@@ -111,7 +109,7 @@ fun noInternetScreen() {
 
 @Composable
 fun SignInScreen() {
-    TODO("Not yet implemented")
+
 }
 
 

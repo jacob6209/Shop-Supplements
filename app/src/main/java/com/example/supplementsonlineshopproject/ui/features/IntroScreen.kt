@@ -14,6 +14,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.supplementsonlineshopproject.R
 import com.example.supplementsonlineshopproject.ui.theme.BackgroundMain
 import com.example.supplementsonlineshopproject.ui.theme.MainAppTheme
+import com.example.supplementsonlineshopproject.util.MyScreens
+import dev.burnoo.cokoin.navigation.getNavController
 
 
 @Preview(showBackground = true)
@@ -25,7 +27,7 @@ fun InteroScreenPreview() {
 
         Surface(
             color = BackgroundMain,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxSize(),
         )
         {
             IntroScreen()
@@ -40,8 +42,10 @@ fun InteroScreenPreview() {
 
 @Composable
 fun IntroScreen() {
+    val navigation= getNavController()
+
     Image(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxSize(),
         painter = painterResource(R.drawable.img_intro),
         contentDescription = null,
         contentScale = ContentScale.Crop
@@ -56,7 +60,7 @@ fun IntroScreen() {
     ) {
         Button(
             modifier = Modifier.fillMaxWidth(0.7f),
-            onClick = { /*TODO*/ }
+            onClick = { navigation.navigate(MyScreens.SignUpScreen.route )}
         ) {
             Text(
                 text = "Sign Up",
@@ -67,7 +71,7 @@ fun IntroScreen() {
         Button(
             modifier = Modifier.fillMaxWidth(0.7f),
             colors =ButtonDefaults.buttonColors(backgroundColor= Color.White),
-            onClick = { /*TODO*/ }
+            onClick = { navigation.navigate(MyScreens.SignInScreen.route) }
         ) {
             Text(
                 text = "Sign In",
