@@ -4,17 +4,17 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.supplementsonlineshopproject.model.myModules
+import com.example.supplementsonlineshopproject.di.myModules
 import com.example.supplementsonlineshopproject.ui.features.IntroScreen
+import com.example.supplementsonlineshopproject.ui.features.resetPassword.RestPasswordScreen
+import com.example.supplementsonlineshopproject.ui.features.signIn.SignInScreen
 import com.example.supplementsonlineshopproject.ui.features.signUp.SignUpScreen
 import com.example.supplementsonlineshopproject.ui.theme.BackgroundMain
 import com.example.supplementsonlineshopproject.ui.theme.MainAppTheme
@@ -91,24 +91,16 @@ fun SupplementsUi(){
             SignUpScreen()
         }
         composable(MyScreens.SignInScreen.route){
-            SignInScreen()
+           SignInScreen()
         }
         composable(MyScreens.IntroScreen.route){
             IntroScreen()
         }
+        composable(MyScreens.ResetPasswordScreen.route){
+            RestPasswordScreen()
+        }
 
     }
-
-}
-
-fun noInternetScreen() {
-    TODO("Not yet implemented")
-}
-
-
-
-@Composable
-fun SignInScreen() {
 
 }
 
@@ -116,22 +108,22 @@ fun SignInScreen() {
 
 @Composable
 fun CartScreen() {
-    TODO("Not yet implemented")
+
 }
 
 @Composable
 fun ProfileScreen() {
-    TODO("Not yet implemented")
+
 }
 
 @Composable
 fun CategoryScreen(CategoryName:String) {
-    TODO("Not yet implemented")
+
 }
 
 @Composable
 fun ProductScreen(ProductId:Int) {
-    TODO("Not yet implemented")
+
 }
 
 @Composable
@@ -140,8 +132,3 @@ fun MainScreen() {
 }
 
 
-//@Preview(showBackground = true)
-//@Composable
-//fun DefaultPreview() {
-//    MainAppTheme {SupplementsUi()}
-//    }

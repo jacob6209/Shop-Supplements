@@ -1,4 +1,4 @@
-package com.example.supplementsonlineshopproject.ui.features.signUp
+package com.example.supplementsonlineshopproject.ui.features.signIn
 
 import android.graphics.Paint.Style
 import android.graphics.drawable.shapes.Shape
@@ -47,14 +47,12 @@ import java.util.SimpleTimeZone
 @Preview(showBackground = true)
 @Composable
 fun SignUpScreenPreview() {
-
-
     MainAppTheme {
         Surface(
             color = BackgroundMain,
             modifier = Modifier.fillMaxSize()
         ) {
-            SignUpScreen()
+            SignInScreen()
         }
 
     }
@@ -63,13 +61,13 @@ fun SignUpScreenPreview() {
 
 
 @Composable
-fun SignUpScreen() {
+fun SignInScreen() {
     val uiController= rememberSystemUiController()
     SideEffect {
         uiController.setStatusBarColor(Blue)
     }
     val navigation= getNavController()
-    val viewModel= getNavViewModel<SignUpViewModel>()
+    val viewModel= getNavViewModel<SignInViewModel>()
     Box{
 
 
@@ -82,7 +80,7 @@ fun SignUpScreen() {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.95f)
+                .fillMaxHeight(0.80f)
                 .verticalScroll(rememberScrollState()),
 
             verticalArrangement = Arrangement.SpaceEvenly,
@@ -93,7 +91,7 @@ fun SignUpScreen() {
             AppIcon()
             MainCardView(navigation,viewModel) {
 
-                viewModel.signUpUser()
+                viewModel.signInUser()
 
 
             }
@@ -126,14 +124,10 @@ fun AppIcon(){
 
 
 @Composable
-fun MainCardView(navigation:NavController,viewModel:SignUpViewModel,SignUpEvent:()->Unit){
-    val name=viewModel.name.observeAsState("")
+fun MainCardView(navigation:NavController,viewModel:SignInViewModel,SignInEvent:()->Unit){
     val email=viewModel.email.observeAsState("")
     val password=viewModel.password.observeAsState("")
-    val confirmpassword=viewModel.confirmPassword.observeAsState("")
     val context= LocalContext.current
-
-
 // Old Method
 //    Card(modifier = Modifier.fillMaxWidth(.9f))
     Card(
@@ -144,7 +138,6 @@ fun MainCardView(navigation:NavController,viewModel:SignUpViewModel,SignUpEvent:
         shape = Shapes.medium
 
     )
-
      {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -152,72 +145,89 @@ fun MainCardView(navigation:NavController,viewModel:SignUpViewModel,SignUpEvent:
         {
             Text(
                 modifier = Modifier.padding(top = 18.dp, bottom = 18.dp),
-                text = "Sign Up",
+                text = "Sign In",
                 style = TextStyle(color = Blue, fontSize = 28.sp, fontWeight = FontWeight.Bold),
             )
 
-            MainTextField(name.value,R.drawable.ic_person,"Your Full Name"){viewModel.name.value=it}
             MainTextField(email.value,R.drawable.ic_email,"Email"){viewModel.email.value=it}
             PasswordTextField(password.value,R.drawable.ic_password,"Password"){viewModel.password.value=it}
-            PasswordTextField(confirmpassword.value,R.drawable.ic_password,"Confirm Password"){viewModel.confirmPassword.value=it}
-
 
             Button(
                 onClick = {
-                          if (name.value.isNotEmpty() && email.value.isNotEmpty() && password.value.isNotEmpty() && confirmpassword.value.isNotEmpty()){
-                                if(password.value==confirmpassword.value){
-                                    if (password.value.length>8){
-                                        if (Patterns.EMAIL_ADDRESS.matcher(email.value).matches()){
-                                            if (NetworkChecker(context).isInternetConnected){
-                                                SignUpEvent.invoke() 
-                                            }else{
-                                                Toast.makeText(context, "No Internet Connection", Toast.LENGTH_SHORT).show()
-                                            }
-                                            
-                                        }else{
-                                            Toast.makeText(context, "Email Format Incorrect", Toast.LENGTH_SHORT).show()
-                                        }
-                                    }else{
-                                        Toast.makeText(context, "Password Length Must be More Than 8 Char", Toast.LENGTH_SHORT).show()
-                                    }
+
+                    if (email.value.isNotEmpty() && password.value.isNotEmpty()) {
+                        if (password.value.length > 8) {
+                            if (Patterns.EMAIL_ADDRESS.matcher(email.value).matches()) {
+                                if (NetworkChecker(context).isInternetConnected){
+                                    SignInEvent.invoke()
                                 }else{
-                                    Toast.makeText(context, "Passwords Not Match", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "No Internet Connection", Toast.LENGTH_SHORT).show()
                                 }
-                          }else{
-                              Toast.makeText(context, "Fill Up Entry Data Field", Toast.LENGTH_SHORT).show()
-                          }
 
-
+                            } else {
+                                Toast.makeText(context,"Email Format is Incorrect",Toast.LENGTH_SHORT).show()
+                            }
+                        } else {
+                            Toast.makeText(context,"Password Length Must be More Than 8 Char",Toast.LENGTH_SHORT).show()
+                        }
+                    } else {
+                        Toast.makeText(context, "Fill Up Entry Data Field", Toast.LENGTH_SHORT).show()
+                    }
                 },
                 modifier = Modifier.padding(top = 28.dp, bottom = 8.dp),
             ) {
                 Text(
                     modifier = Modifier.padding(8.dp),
-                    text = "Register Account"
+                    text = "Log In"
                 )
 
             }
-
-            Row(
+            Column(
                 modifier = Modifier.padding(bottom = 18.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                Text(text = "Already have an Account?")
-                Spacer(modifier = Modifier.width(8.dp))
-               TextButton(onClick ={
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = "Don't Have an Account?")
+                    Spacer(modifier = Modifier.width(2.dp))
+                    TextButton(onClick = {
+                        navigation.navigate(MyScreens.SignUpScreen.route) {
+                            popUpTo(MyScreens.SignInScreen.route) {
+                                inclusive = true
 
-                   navigation.navigate(MyScreens.SignInScreen.route){
+                            }
 
-                       popUpTo(MyScreens.SignUpScreen.route) {
-                           inclusive=true
+                        }
 
-                       }
+                    }) { Text(text = "Register Here", color = Blue) }
+                }
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ){
 
-                   }
+                    Text(text = "Forgot Password?")
+                    Spacer(modifier = Modifier.width(2.dp))
+                    TextButton(onClick ={
 
-               }) {Text(text = "Log In", color = Blue)}
+                        navigation.navigate(MyScreens.ResetPasswordScreen.route){
+                            popUpTo(MyScreens.SignInScreen.route) {
+                                inclusive=true
+
+                            }
+
+                        }
+
+                    }) {Text(text = "Click Here", color = Blue)}
+                }
+
+
             }
+
+
 
 
         }

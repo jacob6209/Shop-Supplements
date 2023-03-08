@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -13,8 +14,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.supplementsonlineshopproject.R
 import com.example.supplementsonlineshopproject.ui.theme.BackgroundMain
+import com.example.supplementsonlineshopproject.ui.theme.Blue
 import com.example.supplementsonlineshopproject.ui.theme.MainAppTheme
 import com.example.supplementsonlineshopproject.util.MyScreens
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dev.burnoo.cokoin.navigation.getNavController
 
 
@@ -42,6 +45,11 @@ fun InteroScreenPreview() {
 
 @Composable
 fun IntroScreen() {
+    val uiController= rememberSystemUiController()
+    SideEffect {
+        uiController.setStatusBarColor(Blue)
+    }
+
     val navigation= getNavController()
 
     Image(

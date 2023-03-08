@@ -1,7 +1,5 @@
-package com.example.supplementsonlineshopproject.ui.features.signUp
+package com.example.supplementsonlineshopproject.ui.features.resetPassword
 
-import android.graphics.Paint.Style
-import android.graphics.drawable.shapes.Shape
 import android.util.Patterns
 import android.widget.Toast
 import androidx.compose.foundation.*
@@ -9,8 +7,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.material.ContentAlpha.medium
-import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.livedata.observeAsState
@@ -20,7 +16,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -31,30 +26,25 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Popup
 import androidx.navigation.NavController
 import com.example.supplementsonlineshopproject.R
-import com.example.supplementsonlineshopproject.ui.features.IntroScreen
 import com.example.supplementsonlineshopproject.ui.theme.*
 import com.example.supplementsonlineshopproject.util.MyScreens
 import com.example.supplementsonlineshopproject.util.NetworkChecker
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dev.burnoo.cokoin.navigation.getNavController
 import dev.burnoo.cokoin.navigation.getNavViewModel
-import java.util.SimpleTimeZone
 
 
 @Preview(showBackground = true)
 @Composable
-fun SignUpScreenPreview() {
-
-
+fun RestPasswordScreenPreview() {
     MainAppTheme {
         Surface(
             color = BackgroundMain,
             modifier = Modifier.fillMaxSize()
         ) {
-            SignUpScreen()
+            RestPasswordScreen()
         }
 
     }
@@ -63,13 +53,14 @@ fun SignUpScreenPreview() {
 
 
 @Composable
-fun SignUpScreen() {
+fun  RestPasswordScreen() {
     val uiController= rememberSystemUiController()
     SideEffect {
         uiController.setStatusBarColor(Blue)
     }
+
     val navigation= getNavController()
-    val viewModel= getNavViewModel<SignUpViewModel>()
+    val viewModel= getNavViewModel<ResetPasswordViewModel>()
     Box{
 
 
@@ -82,8 +73,7 @@ fun SignUpScreen() {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.95f)
-                .verticalScroll(rememberScrollState()),
+                .fillMaxHeight(0.75f),
 
             verticalArrangement = Arrangement.SpaceEvenly,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -93,7 +83,7 @@ fun SignUpScreen() {
             AppIcon()
             MainCardView(navigation,viewModel) {
 
-                viewModel.signUpUser()
+                viewModel.ResetPasswordUser()
 
 
             }
@@ -126,16 +116,9 @@ fun AppIcon(){
 
 
 @Composable
-fun MainCardView(navigation:NavController,viewModel:SignUpViewModel,SignUpEvent:()->Unit){
-    val name=viewModel.name.observeAsState("")
+fun MainCardView(navigation:NavController, viewModel:ResetPasswordViewModel, ResetPasswordEvent:()->Unit){
     val email=viewModel.email.observeAsState("")
-    val password=viewModel.password.observeAsState("")
-    val confirmpassword=viewModel.confirmPassword.observeAsState("")
     val context= LocalContext.current
-
-
-// Old Method
-//    Card(modifier = Modifier.fillMaxWidth(.9f))
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -144,7 +127,6 @@ fun MainCardView(navigation:NavController,viewModel:SignUpViewModel,SignUpEvent:
         shape = Shapes.medium
 
     )
-
      {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -152,50 +134,26 @@ fun MainCardView(navigation:NavController,viewModel:SignUpViewModel,SignUpEvent:
         {
             Text(
                 modifier = Modifier.padding(top = 18.dp, bottom = 18.dp),
-                text = "Sign Up",
+                text = "Reset Password",
                 style = TextStyle(color = Blue, fontSize = 28.sp, fontWeight = FontWeight.Bold),
             )
-
-            MainTextField(name.value,R.drawable.ic_person,"Your Full Name"){viewModel.name.value=it}
             MainTextField(email.value,R.drawable.ic_email,"Email"){viewModel.email.value=it}
-            PasswordTextField(password.value,R.drawable.ic_password,"Password"){viewModel.password.value=it}
-            PasswordTextField(confirmpassword.value,R.drawable.ic_password,"Confirm Password"){viewModel.confirmPassword.value=it}
-
-
             Button(
                 onClick = {
-                          if (name.value.isNotEmpty() && email.value.isNotEmpty() && password.value.isNotEmpty() && confirmpassword.value.isNotEmpty()){
-                                if(password.value==confirmpassword.value){
-                                    if (password.value.length>8){
-                                        if (Patterns.EMAIL_ADDRESS.matcher(email.value).matches()){
-                                            if (NetworkChecker(context).isInternetConnected){
-                                                SignUpEvent.invoke() 
-                                            }else{
-                                                Toast.makeText(context, "No Internet Connection", Toast.LENGTH_SHORT).show()
-                                            }
-                                            
-                                        }else{
-                                            Toast.makeText(context, "Email Format Incorrect", Toast.LENGTH_SHORT).show()
-                                        }
-                                    }else{
-                                        Toast.makeText(context, "Password Length Must be More Than 8 Char", Toast.LENGTH_SHORT).show()
-                                    }
-                                }else{
-                                    Toast.makeText(context, "Passwords Not Match", Toast.LENGTH_SHORT).show()
-                                }
-                          }else{
-                              Toast.makeText(context, "Fill Up Entry Data Field", Toast.LENGTH_SHORT).show()
-                          }
-
-
+                    if (Patterns.EMAIL_ADDRESS.matcher(email.value).matches()) {
+                        if (NetworkChecker(context).isInternetConnected){
+                            ResetPasswordEvent.invoke()
+                        }else{
+                            Toast.makeText(context,"No Internet Connection", Toast.LENGTH_SHORT).show()
+                        }
+                    } else {
+                        Toast.makeText(context,"Email Format Incorrect", Toast.LENGTH_SHORT).show()
+                    }
                 },
                 modifier = Modifier.padding(top = 28.dp, bottom = 8.dp),
-            ) {
-                Text(
-                    modifier = Modifier.padding(8.dp),
-                    text = "Register Account"
-                )
-
+            )
+            {
+             Text(text = "Reset", color= Color.White)
             }
 
             Row(
@@ -203,20 +161,19 @@ fun MainCardView(navigation:NavController,viewModel:SignUpViewModel,SignUpEvent:
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ){
-                Text(text = "Already have an Account?")
-                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = "Don't Have an Account?")
+                Spacer(modifier = Modifier.width(2.dp))
                TextButton(onClick ={
 
-                   navigation.navigate(MyScreens.SignInScreen.route){
-
-                       popUpTo(MyScreens.SignUpScreen.route) {
-                           inclusive=true
+                   navigation.navigate(MyScreens.SignUpScreen.route){
+                       popUpTo(MyScreens.IntroScreen.route) {
+                           inclusive=false
 
                        }
 
                    }
 
-               }) {Text(text = "Log In", color = Blue)}
+               }) {Text(text = "Register Here", color = Blue)}
             }
 
 

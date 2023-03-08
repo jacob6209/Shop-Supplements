@@ -10,4 +10,5 @@ sealed class MyScreens(val route:String){
     object SignUpScreen:MyScreens("SignUpScreen")
     object SignInScreen:MyScreens("SignInScreen")
     object IntroScreen:MyScreens("IntroScreen")
+    object ResetPasswordScreen:MyScreens("ResetPasswordScreen")
 }
