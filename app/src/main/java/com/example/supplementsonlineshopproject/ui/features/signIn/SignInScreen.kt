@@ -38,6 +38,7 @@ import com.example.supplementsonlineshopproject.ui.features.IntroScreen
 import com.example.supplementsonlineshopproject.ui.theme.*
 import com.example.supplementsonlineshopproject.util.MyScreens
 import com.example.supplementsonlineshopproject.util.NetworkChecker
+import com.example.supplementsonlineshopproject.util.VALUE_SUCCESS
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dev.burnoo.cokoin.navigation.getNavController
 import dev.burnoo.cokoin.navigation.getNavViewModel
@@ -66,6 +67,7 @@ fun SignInScreen() {
     SideEffect {
         uiController.setStatusBarColor(Blue)
     }
+    val context= LocalContext.current
     val navigation= getNavController()
     val viewModel= getNavViewModel<SignInViewModel>()
     Box{
@@ -91,8 +93,17 @@ fun SignInScreen() {
             AppIcon()
             MainCardView(navigation,viewModel) {
 
-                viewModel.signInUser()
-
+                viewModel.signInUser(context) { result ->
+                    if (result == VALUE_SUCCESS) {
+                        navigation.navigate(MyScreens.MainScreen.route) {
+                            popUpTo(MyScreens.IntroScreen.route) {
+                                inclusive = true
+                            }
+                        }
+                    } else {
+                        Toast.makeText(context, result, Toast.LENGTH_SHORT).show()
+                    }
+                }
 
             }
 
@@ -154,7 +165,6 @@ fun MainCardView(navigation:NavController,viewModel:SignInViewModel,SignInEvent:
 
             Button(
                 onClick = {
-
                     if (email.value.isNotEmpty() && password.value.isNotEmpty()) {
                         if (password.value.length > 8) {
                             if (Patterns.EMAIL_ADDRESS.matcher(email.value).matches()) {

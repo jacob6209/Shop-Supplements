@@ -12,6 +12,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.supplementsonlineshopproject.di.myModules
+import com.example.supplementsonlineshopproject.model.repository.TokenInMemory
+import com.example.supplementsonlineshopproject.model.repository.user.UserRepository
 import com.example.supplementsonlineshopproject.ui.features.IntroScreen
 import com.example.supplementsonlineshopproject.ui.features.resetPassword.RestPasswordScreen
 import com.example.supplementsonlineshopproject.ui.features.signIn.SignInScreen
@@ -22,20 +24,27 @@ import com.example.supplementsonlineshopproject.util.KEY_CATEGORY_ARG
 import com.example.supplementsonlineshopproject.util.KEY_PRODUCT_ARG
 import com.example.supplementsonlineshopproject.util.MyScreens
 import dev.burnoo.cokoin.Koin
+import dev.burnoo.cokoin.get
 import dev.burnoo.cokoin.navigation.KoinNavHost
+import org.koin.android.ext.koin.androidContext
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
 
-            Koin(appDeclaration = {modules(myModules)}) {
+            Koin(appDeclaration = {
+                androidContext(this@MainActivity)
+                modules(myModules)
+            }) {
 
                 MainAppTheme {
                     Surface(
                         color= BackgroundMain,
                         modifier = Modifier.fillMaxSize()
                     ){
+                        val userRepository:UserRepository=get()
+                        userRepository.loadToken()
                         SupplementsUi()
                     }
 
@@ -53,10 +62,14 @@ fun SupplementsUi(){
     val navController= rememberNavController()
     KoinNavHost(
         navController=navController,
-        startDestination = MyScreens.IntroScreen.route,
+        startDestination = MyScreens.MainScreen.route,
     ){
         composable(MyScreens.MainScreen.route){
-            MainScreen()
+             if (TokenInMemory.access != null){
+                MainScreen()
+            }else
+                IntroScreen()
+
         }
         composable(
             route = MyScreens.ProductScreen.route+"/"+ KEY_PRODUCT_ARG,
@@ -64,7 +77,6 @@ fun SupplementsUi(){
                 type= NavType.IntType
             })
         ){
-
             ProductScreen(it.arguments!!.getInt(KEY_PRODUCT_ARG,-1)) //id Product
         }
 
@@ -76,8 +88,6 @@ fun SupplementsUi(){
         ){
             CategoryScreen(it.arguments!!.getString(KEY_CATEGORY_ARG,""))
         }
-
-
 
 
         composable(MyScreens.ProfileScreen.route){

@@ -27,7 +27,6 @@ fun InteroScreenPreview() {
 
 
     MainAppTheme {
-
         Surface(
             color = BackgroundMain,
             modifier = Modifier.fillMaxSize(),
@@ -37,9 +36,7 @@ fun InteroScreenPreview() {
 
         }
 
-
     }
-
 
 }
 

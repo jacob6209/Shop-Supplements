@@ -38,6 +38,7 @@ import com.example.supplementsonlineshopproject.ui.features.IntroScreen
 import com.example.supplementsonlineshopproject.ui.theme.*
 import com.example.supplementsonlineshopproject.util.MyScreens
 import com.example.supplementsonlineshopproject.util.NetworkChecker
+import com.example.supplementsonlineshopproject.util.VALUE_SUCCESS
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dev.burnoo.cokoin.navigation.getNavController
 import dev.burnoo.cokoin.navigation.getNavViewModel
@@ -65,9 +66,9 @@ fun SignUpScreenPreview() {
 @Composable
 fun SignUpScreen() {
     val uiController= rememberSystemUiController()
-    SideEffect {
-        uiController.setStatusBarColor(Blue)
-    }
+    SideEffect {uiController.setStatusBarColor(Blue)}
+    
+    val context= LocalContext.current
     val navigation= getNavController()
     val viewModel= getNavViewModel<SignUpViewModel>()
     Box{
@@ -93,7 +94,20 @@ fun SignUpScreen() {
             AppIcon()
             MainCardView(navigation,viewModel) {
 
-                viewModel.signUpUser()
+                viewModel.signUpUser{
+                    if (it== VALUE_SUCCESS){
+                       Toast.makeText(context, "An Activation Email Sent,To Login Activate Your Account First", Toast.LENGTH_LONG).show()
+
+                       navigation.navigate(MyScreens.SignInScreen.route){
+                           popUpTo(MyScreens.IntroScreen.route){
+                               inclusive=true
+                           }
+                       }
+                    }else
+                    {
+                        Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+                    }
+                }
 
 
             }
@@ -127,7 +141,7 @@ fun AppIcon(){
 
 @Composable
 fun MainCardView(navigation:NavController,viewModel:SignUpViewModel,SignUpEvent:()->Unit){
-    val name=viewModel.name.observeAsState("")
+    val username=viewModel.username.observeAsState("")
     val email=viewModel.email.observeAsState("")
     val password=viewModel.password.observeAsState("")
     val confirmpassword=viewModel.confirmPassword.observeAsState("")
@@ -156,7 +170,7 @@ fun MainCardView(navigation:NavController,viewModel:SignUpViewModel,SignUpEvent:
                 style = TextStyle(color = Blue, fontSize = 28.sp, fontWeight = FontWeight.Bold),
             )
 
-            MainTextField(name.value,R.drawable.ic_person,"Your Full Name"){viewModel.name.value=it}
+            MainTextField(username.value,R.drawable.ic_person,"Your Full Name"){viewModel.username.value=it}
             MainTextField(email.value,R.drawable.ic_email,"Email"){viewModel.email.value=it}
             PasswordTextField(password.value,R.drawable.ic_password,"Password"){viewModel.password.value=it}
             PasswordTextField(confirmpassword.value,R.drawable.ic_password,"Confirm Password"){viewModel.confirmPassword.value=it}
@@ -164,7 +178,7 @@ fun MainCardView(navigation:NavController,viewModel:SignUpViewModel,SignUpEvent:
 
             Button(
                 onClick = {
-                          if (name.value.isNotEmpty() && email.value.isNotEmpty() && password.value.isNotEmpty() && confirmpassword.value.isNotEmpty()){
+                          if (username.value.isNotEmpty() && email.value.isNotEmpty() && password.value.isNotEmpty() && confirmpassword.value.isNotEmpty()){
                                 if(password.value==confirmpassword.value){
                                     if (password.value.length>8){
                                         if (Patterns.EMAIL_ADDRESS.matcher(email.value).matches()){

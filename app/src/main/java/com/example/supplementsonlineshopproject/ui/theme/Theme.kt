@@ -17,7 +17,8 @@ import com.example.supplementsonlineshopproject.ui.theme.Typography
 private val LightColorPalette = lightColors(
     primary = Blue ,
     secondary = Blue,
-    background = BackgroundMain
+    background = BackgroundMain,
+    surface = CardViewBackground
 
     /* Other default colors to override
     background = Color.White,
@@ -39,8 +40,8 @@ fun MainAppTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composabl
         shapes = Shapes,
         content = content
     )
+    val systemuiconteroller= rememberSystemUiController()
+    systemuiconteroller.setStatusBarColor(BackgroundMain)
 
-    val systemUiController = rememberSystemUiController()
-    systemUiController.setStatusBarColor(Color.White)
 
 }
