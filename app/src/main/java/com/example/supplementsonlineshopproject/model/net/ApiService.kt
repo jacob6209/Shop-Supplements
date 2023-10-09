@@ -41,7 +41,6 @@ fun CreateApiService():ApiService{
             if (TokenInMemory.access != null){
                 newRequest.addHeader("Authorization", "JWT " + TokenInMemory.access!!)
             }
-                 Log.d("Request Headers", newRequest.build().headers.toString())
                 newRequest.addHeader("Accept", "application/json")
                 newRequest.method(oldRequest.method, oldRequest.body)
             return@addInterceptor it.proceed(newRequest.build())

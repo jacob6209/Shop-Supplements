@@ -15,6 +15,7 @@ import com.example.supplementsonlineshopproject.di.myModules
 import com.example.supplementsonlineshopproject.model.repository.TokenInMemory
 import com.example.supplementsonlineshopproject.model.repository.user.UserRepository
 import com.example.supplementsonlineshopproject.ui.features.IntroScreen
+import com.example.supplementsonlineshopproject.ui.features.main.MainScreen
 import com.example.supplementsonlineshopproject.ui.features.resetPassword.RestPasswordScreen
 import com.example.supplementsonlineshopproject.ui.features.signIn.SignInScreen
 import com.example.supplementsonlineshopproject.ui.features.signUp.SignUpScreen
@@ -136,9 +137,7 @@ fun ProductScreen(ProductId:Int) {
 
 }
 
-@Composable
-fun MainScreen() {
 
-}
+
 
 

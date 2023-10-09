@@ -81,7 +81,6 @@ class UserRepositoryImpl(
 
     override fun loadToken() {
         TokenInMemory.refreshToken(getToken(),getRefreshToken())
-
     }
 
     override fun saveToken(newToken: String) {
