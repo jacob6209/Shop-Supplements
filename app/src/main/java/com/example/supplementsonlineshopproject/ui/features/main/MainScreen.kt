@@ -14,6 +14,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Shapes
@@ -30,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -38,11 +40,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.supplementsonlineshopproject.R
 import com.example.supplementsonlineshopproject.ui.theme.BackgroundMain
+import com.example.supplementsonlineshopproject.ui.theme.Blue
 import com.example.supplementsonlineshopproject.ui.theme.CardViewBackground
 import com.example.supplementsonlineshopproject.ui.theme.CardViewBackgroundItem
 import com.example.supplementsonlineshopproject.ui.theme.MainAppTheme
 import com.example.supplementsonlineshopproject.ui.theme.Shapes
+import com.example.supplementsonlineshopproject.util.CATEGORY
+import com.example.supplementsonlineshopproject.util.NetworkChecker
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import dev.burnoo.cokoin.navigation.getNavViewModel
+import dev.burnoo.cokoin.viewmodel.getViewModel
+import org.koin.core.parameter.parametersOf
+import java.nio.file.WatchEvent
 
 @Preview(showBackground = true)
 @Composable
@@ -60,8 +69,11 @@ fun MainScreenPreview(){
 
 @Composable
 fun MainScreen() {
+    val context= LocalContext.current
     val uiController = rememberSystemUiController()
-
+    val viewModel= getNavViewModel<MainViewModel>(
+        parameters = {parametersOf(NetworkChecker(context).isInternetConnected)}
+    )
     Scaffold(
         topBar = { TopToolbar() }
     ) { innerPadding ->    /* avoid overlapping with the system insets (like the status bar and navigation bar)    */
@@ -75,12 +87,18 @@ fun MainScreen() {
                 .padding(innerPadding)
                 .padding(bottom = 16.dp)
         ) {
-            Categorybar()
-            ProductSubject()
-            ProductSubject()
-            BigPictureTablighat()
-            ProductSubject()
-            ProductSubject()
+            if (viewModel.showProgressBar.value){
+                LinearProgressIndicator(
+                    modifier =Modifier.fillMaxWidth(),
+                    color = Blue
+                )
+            }
+            Categorybar(CATEGORY)
+//            ProductSubject()
+//            ProductSubject()
+//            BigPictureTablighat()
+//            ProductSubject()
+//            ProductSubject()
         }
     }
 }
@@ -107,19 +125,19 @@ TopAppBar(
 }
 //<----------------------------------------------------------------------------------->
 @Composable
-fun Categorybar() {
+fun Categorybar(CategoryList:List<Pair<String,Int>>) {
 LazyRow(
     modifier = Modifier.padding(top = 16.dp),
     contentPadding = PaddingValues(end = 16.dp)
 ){
-    items(10){
-        CategoryItem()
+    items(CategoryList.size){
+        CategoryItem(CategoryList[it])
     }
 }
 }
 
 @Composable
-fun CategoryItem(){
+fun CategoryItem(subject:Pair<String,Int>){
     Column (modifier = Modifier
         .padding(start = 16.dp)
         .clickable {},
@@ -132,12 +150,12 @@ fun CategoryItem(){
     ){
       Image(
           modifier = Modifier.padding(16.dp),
-          painter = painterResource(id = R.drawable.ic_app),
+          painter = painterResource(id = subject.second),
           contentDescription = null,
       )
     }
         Text(
-            text = "Category",
+            text = subject.first,
             modifier = Modifier.padding(top = 4.dp),
             style = TextStyle(color = Color.Gray)
         )

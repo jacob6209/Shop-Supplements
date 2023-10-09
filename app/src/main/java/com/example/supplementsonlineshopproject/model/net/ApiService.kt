@@ -1,8 +1,10 @@
 package com.example.supplementsonlineshopproject.model.net
 
 import android.util.Log
+import com.example.supplementsonlineshopproject.model.data.AdsResponse
 import com.example.supplementsonlineshopproject.model.data.LoginResponse
 import com.example.supplementsonlineshopproject.model.data.PassResetResponse
+import com.example.supplementsonlineshopproject.model.data.ProductResponse
 import com.example.supplementsonlineshopproject.model.data.RefreshToken
 import com.example.supplementsonlineshopproject.model.data.SignUpResponse
 import com.example.supplementsonlineshopproject.model.repository.TokenInMemory
@@ -14,6 +16,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
 
 interface ApiService {
@@ -28,6 +31,10 @@ interface ApiService {
 
     @POST("jwt/refresh/")
     fun refreshToken(@Body jsonObject: JsonObject):Call<RefreshToken>
+    @GET("store/products/")
+    suspend fun getAllProducts():Response<List<ProductResponse>>
+    @GET("store/getads/")
+    suspend fun getAds():Response<List<AdsResponse>>
 
 }
 
