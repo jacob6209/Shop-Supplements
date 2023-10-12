@@ -24,12 +24,17 @@ data class ProductResponse(
     val slug: String,
     val title: String,
     val top_deal: Boolean,
-    val unit_price: Double
+    val unit_price: Double,
+    val tags: String?,
+    val soled_item:Int,
+
 )
 data class Image(
     val id: Int,
     val image: String,
-    val product: Int
+    val product: Int,
+    @Transient
+    val image_url: String // Add the image URL property here
 )
 data class Comment(
     val body: String,

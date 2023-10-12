@@ -23,13 +23,13 @@ interface ApiService {
     @POST("users/")
     suspend fun signUp(@Body jsonObject: JsonObject):Response<SignUpResponse>
 
-    @POST("jwt/create/")
+    @POST("auth/jwt/create/")
    suspend fun signIn(@Body jsonObject: JsonObject):LoginResponse
 
-    @POST("password_reset/?")
+    @POST("auth/password_reset/?")
     suspend fun PassReset(@Body jsonObject: JsonObject):PassResetResponse
 
-    @POST("jwt/refresh/")
+    @POST("auth/jwt/refresh/")
     fun refreshToken(@Body jsonObject: JsonObject):Call<RefreshToken>
     @GET("store/products/")
     suspend fun getAllProducts():Response<List<ProductResponse>>
@@ -44,9 +44,10 @@ fun CreateApiService():ApiService{
         .addInterceptor {
             val oldRequest = it.request()
             val newRequest = oldRequest.newBuilder()
-
+            // to do=> remove JWT header Type
             if (TokenInMemory.access != null){
-                newRequest.addHeader("Authorization", "JWT " + TokenInMemory.access!!)
+//                newRequest.addHeader("Authorization",TokenInMemory.access!!)
+                newRequest.addHeader("Authorization", "JWT" + TokenInMemory.access!!)
             }
                 newRequest.addHeader("Accept", "application/json")
                 newRequest.method(oldRequest.method, oldRequest.body)

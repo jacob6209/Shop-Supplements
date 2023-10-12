@@ -34,10 +34,9 @@ class MainViewModel(
             val newDataProduct =async{productRepository.getAllProducts(isInternetConnected)}
             val newDataAds =async{productRepository.getAllAds(isInternetConnected)}
             updateData(newDataProduct.await(),newDataAds.await())
+
             showProgressBar.value=false
-
         }
-
 
     }
 

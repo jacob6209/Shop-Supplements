@@ -2,6 +2,7 @@ package com.example.supplementsonlineshopproject.model.repository.user
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import com.example.supplementsonlineshopproject.model.data.SignUpResponse
 import com.example.supplementsonlineshopproject.model.net.ApiService
 import com.example.supplementsonlineshopproject.model.repository.TokenInMemory
@@ -79,8 +80,22 @@ class UserRepositoryImpl(
         sharedPref.edit().clear().apply()
     }
 
+
+//    override fun loadToken() {
+//        val token = getToken()
+//        if (token != null) {
+//            TokenInMemory.refreshToken(token, getRefreshToken())
+//            Log.d("TokenLoading", "Token loaded: $token")
+//        } else {
+//            Log.d("TokenLoading", "Token not found in SharedPreferences")
+//        }
+//    }
+
+
+
     override fun loadToken() {
         TokenInMemory.refreshToken(getToken(),getRefreshToken())
+        Log.d("TokenLoading", "Token loaded: ${TokenInMemory}()")
     }
 
     override fun saveToken(newToken: String) {
@@ -89,7 +104,9 @@ class UserRepositoryImpl(
 
     override fun getToken(): String? {
         return sharedPref.getString("access",null)
+
     }
+
 
     override fun saveRefreshToken(refresh: String) {
         sharedPref.edit().putString("refresh", refresh).apply()

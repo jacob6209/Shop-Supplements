@@ -15,7 +15,7 @@ class AuthChecker : Authenticator, KoinComponent {
 
     override fun authenticate(route: Route?, response: Response): Request? {
 
-        if (TokenInMemory.access != null && !response.request.url.pathSegments.last().equals("jwt/refresh/", false)) {
+        if (TokenInMemory.access != null && !response.request.url.pathSegments.last().equals("auth/jwt/refresh/", false)) {
 
             val result = refreshToken()
             if (result) {
