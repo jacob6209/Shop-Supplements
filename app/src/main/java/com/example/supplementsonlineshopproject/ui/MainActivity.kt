@@ -75,16 +75,16 @@ fun SupplementsUi(){
 
         }
         composable(
-            route = MyScreens.ProductScreen.route+"/"+ KEY_PRODUCT_ARG,
+            route = MyScreens.ProductScreen.route+"/"+ "{$KEY_PRODUCT_ARG}",
             arguments = listOf(navArgument(KEY_PRODUCT_ARG){
-                type= NavType.IntType
+                type= NavType.StringType
             })
         ){
-            ProductScreen(it.arguments!!.getInt(KEY_PRODUCT_ARG,-1)) //id Product
+            ProductScreen(it.arguments!!.getString(KEY_PRODUCT_ARG,"null")) //id Product
         }
 
 
-        composable(route = MyScreens.CategoryScreen.route+"/"+ KEY_CATEGORY_ARG,
+        composable(route = MyScreens.CategoryScreen.route+"/"+ "{$KEY_CATEGORY_ARG}",
         arguments = listOf(navArgument(KEY_CATEGORY_ARG){
             type= NavType.StringType
         })
@@ -106,10 +106,7 @@ fun SupplementsUi(){
         composable(MyScreens.SignInScreen.route){
            SignInScreen()
         }
-        composable(MyScreens.IntroScreen.route){
-            IntroScreen()
-        }
-        composable(MyScreens.ResetPasswordScreen.route){
+             composable(MyScreens.ResetPasswordScreen.route){
             RestPasswordScreen()
         }
 
@@ -135,7 +132,7 @@ fun CategoryScreen(CategoryName:String) {
 }
 
 @Composable
-fun ProductScreen(ProductId:Int) {
+fun ProductScreen(ProductId:String) {
 
 }
 
