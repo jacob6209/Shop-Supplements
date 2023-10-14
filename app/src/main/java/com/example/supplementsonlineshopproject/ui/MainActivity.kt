@@ -16,6 +16,8 @@ import com.example.supplementsonlineshopproject.di.myModules
 import com.example.supplementsonlineshopproject.model.repository.TokenInMemory
 import com.example.supplementsonlineshopproject.model.repository.user.UserRepository
 import com.example.supplementsonlineshopproject.ui.features.IntroScreen
+import com.example.supplementsonlineshopproject.ui.features.category.CategoryScreen
+//import com.example.supplementsonlineshopproject.ui.features.category.CategoryScreen
 import com.example.supplementsonlineshopproject.ui.features.main.MainScreen
 import com.example.supplementsonlineshopproject.ui.features.resetPassword.RestPasswordScreen
 import com.example.supplementsonlineshopproject.ui.features.signIn.SignInScreen
@@ -84,12 +86,13 @@ fun SupplementsUi(){
         }
 
 
-        composable(route = MyScreens.CategoryScreen.route+"/"+ "{$KEY_CATEGORY_ARG}",
-        arguments = listOf(navArgument(KEY_CATEGORY_ARG){
-            type= NavType.StringType
-        })
-        ){
-            CategoryScreen(it.arguments!!.getString(KEY_CATEGORY_ARG,""))
+        composable(
+            route = MyScreens.CategoryScreen.route + "/{$KEY_CATEGORY_ARG}",
+            arguments = listOf(navArgument(KEY_CATEGORY_ARG) {
+                type = NavType.StringType
+            })
+        ) {
+            CategoryScreen(it.arguments!!.getString(KEY_CATEGORY_ARG,"null"))
         }
 
 
@@ -126,10 +129,7 @@ fun ProfileScreen() {
 
 }
 
-@Composable
-fun CategoryScreen(CategoryName:String) {
 
-}
 
 @Composable
 fun ProductScreen(ProductId:String) {

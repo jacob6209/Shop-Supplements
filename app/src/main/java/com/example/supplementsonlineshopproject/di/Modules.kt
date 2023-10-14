@@ -11,6 +11,7 @@ import com.example.supplementsonlineshopproject.model.repository.product.Product
 import com.example.supplementsonlineshopproject.model.repository.product.ProductRepositoryImpl
 import com.example.supplementsonlineshopproject.model.repository.user.UserRepository
 import com.example.supplementsonlineshopproject.model.repository.user.UserRepositoryImpl
+import com.example.supplementsonlineshopproject.ui.features.category.CategoryViewModel
 import com.example.supplementsonlineshopproject.ui.features.main.MainViewModel
 import com.example.supplementsonlineshopproject.ui.features.resetPassword.ResetPasswordViewModel
 import com.example.supplementsonlineshopproject.ui.features.signIn.SignInViewModel
@@ -29,6 +30,6 @@ val myModules= module {
     viewModel{SignUpViewModel(get())}
     viewModel{SignInViewModel(get())}
     viewModel{ResetPasswordViewModel()}
-
+    viewModel{ CategoryViewModel(get()) }
     viewModel{(isNetConnected:Boolean)->MainViewModel(get(),isNetConnected)}
 }

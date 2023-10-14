@@ -4,7 +4,9 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.example.supplementsonlineshopproject.model.data.CategoryResponse
 import com.example.supplementsonlineshopproject.model.data.ProductResponse
+
 
 @Dao
 interface ProductDao {
@@ -16,4 +18,8 @@ interface ProductDao {
 
     @Query("SELECT * FROM Product_tabel WHERE id=:productId")
     suspend fun getByid(productId:Int): ProductResponse
+    @Query("SELECT * FROM Product_tabel WHERE category_title=:category")
+    suspend fun getAllByCategory(category:String):List<ProductResponse>
+
+
 }

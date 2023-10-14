@@ -6,13 +6,18 @@ import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import android.os.Parcelable
+//import kotlinx.android.parcel.Parcelize
+
+
 
 @Entity("Product_tabel")
 data class ProductResponse(
     @PrimaryKey
     val id: Int,
     val average_rating: Double,
-    val category: Int,
+    val category:Int,
+    val category_title:String,
     @TypeConverters(CommentListConverter::class)
     val comments: List<Comment>,
     val description: String,
@@ -28,6 +33,12 @@ data class ProductResponse(
     val tags: String?,
     val soled_item:Int,
 
+)
+
+data class CategoryResponse(
+    val id: Int,
+    val title: String,
+    val description: String
 )
 data class Image(
     val id: Int,
