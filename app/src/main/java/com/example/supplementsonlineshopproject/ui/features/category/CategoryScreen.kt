@@ -1,37 +1,60 @@
 package com.example.supplementsonlineshopproject.ui.features.category
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.supplementsonlineshopproject.R
 import com.example.supplementsonlineshopproject.model.data.ProductResponse
 import com.example.supplementsonlineshopproject.ui.theme.Blue
+import com.example.supplementsonlineshopproject.ui.theme.DIMENS_114dp
+import com.example.supplementsonlineshopproject.ui.theme.DIMENS_12dp
+import com.example.supplementsonlineshopproject.ui.theme.DIMENS_16dp
 import com.example.supplementsonlineshopproject.ui.theme.Shapes
 import com.example.supplementsonlineshopproject.util.BASE_URL
 import com.example.supplementsonlineshopproject.util.MyScreens
+import com.example.supplementsonlineshopproject.util.lerp
+import com.google.accompanist.coil.rememberCoilPainter
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.HorizontalPagerIndicator
+import com.google.accompanist.pager.calculateCurrentOffsetForPage
+import com.google.accompanist.pager.rememberPagerState
 import dev.burnoo.cokoin.navigation.getNavController
 import dev.burnoo.cokoin.navigation.getNavViewModel
+import kotlinx.coroutines.delay
+import java.lang.Thread.yield
+import kotlin.math.absoluteValue
+
 
 @Composable
 fun CategoryScreen(categoryTitle: String) {
@@ -54,11 +77,13 @@ fun CategoryScreen(categoryTitle: String) {
     }
 }
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
-fun CategoryItem(data: ProductResponse, onProductClicked: (Int) -> Unit) {
+fun CategoryItem(data: ProductResponse, onProductClicked: (Int) -> Unit,modifier: Modifier = Modifier) {
     Card(
         modifier = Modifier
-            .fillMaxWidth()
+//            .fillMaxWidth(fraction = 0.95f)
+            .fillMaxSize()
             .padding(start = 16.dp, end = 16.dp, top = 16.dp)
             .clickable { onProductClicked.invoke(data.id) },
         elevation = 4.dp,
@@ -66,15 +91,16 @@ fun CategoryItem(data: ProductResponse, onProductClicked: (Int) -> Unit) {
 
         ) {
         Column {
-
-
+///----------------------------------------------------------------------
+//            SliderBanner(data,modifier)
+//--------------------------------------------------------------------------------
             AsyncImage(
                 model = BASE_URL+data.images.firstOrNull()?.image,
                 contentDescription = null,
-                contentScale = ContentScale.Crop,
+                contentScale = ContentScale.FillBounds,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
+                    .fillMaxSize()
+//                    .height(200.dp)
             )
             Row(
                 modifier = Modifier
@@ -151,4 +177,76 @@ fun CategoryToolBar(categoryName: String,) {
         }
     )
 
+}
+
+
+//---------------------------------------------------------
+@ExperimentalPagerApi
+@Composable
+fun SliderBanner(
+    data: ProductResponse,
+    modifier: Modifier = Modifier
+) {
+    val pagerState = rememberPagerState(initialPage = 0)
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            kotlinx.coroutines.yield()
+            delay(2600)
+            pagerState.animateScrollToPage(
+                page = (pagerState.currentPage + 1) % (pagerState.pageCount)
+            )
+        }
+    }
+
+    Column {
+        HorizontalPager(
+            count = data.images.size,
+            state = pagerState,
+            contentPadding = PaddingValues(horizontal = DIMENS_16dp),
+            modifier = modifier
+                .height(DIMENS_114dp)
+                .fillMaxWidth()
+        ) { page ->
+            Card(
+                shape = RoundedCornerShape(DIMENS_12dp),
+                modifier = Modifier
+                    .graphicsLayer {
+                        val pageOffset = calculateCurrentOffsetForPage(page).absoluteValue
+
+                        lerp(
+                            start = 0.85f,
+                            stop = 1f,
+                            fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                        ).also { scale ->
+                            scaleX = scale
+                            scaleY = scale
+                        }
+
+                        alpha = lerp(
+                            start = 0.5f,
+                            stop = 1f,
+                            fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                        )
+                    }
+            ) {
+
+                AsyncImage(
+                model = BASE_URL+data.images[page].image,
+                contentDescription = null,
+                contentScale = ContentScale.FillWidth,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+            )
+            }
+        }
+
+        HorizontalPagerIndicator(
+            pagerState = pagerState,
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(DIMENS_16dp)
+        )
+    }
 }

@@ -96,4 +96,9 @@ dependencies {
 
     // Lottie Animations
     implementation "com.airbnb.android:lottie-compose:5.2.0"
+
+    implementation "com.google.accompanist:accompanist-pager:0.28.0"
+    implementation "com.google.accompanist:accompanist-pager-indicators:0.28.0"
+
+    implementation "com.google.accompanist:accompanist-coil:0.15.0"
 }

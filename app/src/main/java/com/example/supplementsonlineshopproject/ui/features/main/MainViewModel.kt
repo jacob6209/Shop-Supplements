@@ -10,6 +10,7 @@ import com.example.supplementsonlineshopproject.model.data.AdsResponse
 import com.example.supplementsonlineshopproject.model.data.ProductResponse
 import com.example.supplementsonlineshopproject.model.repository.product.ProductRepository
 import com.example.supplementsonlineshopproject.model.repository.user.UserRepository
+import com.example.supplementsonlineshopproject.util.coroutinExceptionHandler
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import retrofit2.Response
@@ -28,7 +29,7 @@ class MainViewModel(
         refreshAllDataFromNet(isInternetConnected)
     }
     private fun refreshAllDataFromNet(isInternetConnected:Boolean){
-        viewModelScope.launch {
+        viewModelScope.launch(coroutinExceptionHandler){
             if (isInternetConnected)
                 showProgressBar.value=true
             val newDataProduct =async{productRepository.getAllProducts(isInternetConnected)}

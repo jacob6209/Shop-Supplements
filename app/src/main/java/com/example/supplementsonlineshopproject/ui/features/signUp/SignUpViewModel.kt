@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.supplementsonlineshopproject.model.repository.user.UserRepository
+import com.example.supplementsonlineshopproject.util.coroutinExceptionHandler
 import kotlinx.coroutines.launch
 import kotlin.math.log
 
@@ -17,7 +18,7 @@ class SignUpViewModel(private val userRepository: UserRepository):ViewModel() {
 
 
     fun signUpUser(LoggingEvent:(String)->Unit){
-  viewModelScope.launch{
+  viewModelScope.launch(coroutinExceptionHandler){
       val result= userRepository.signUp(username.value!!,email.value!!,password.value!!)
       LoggingEvent(result)
 

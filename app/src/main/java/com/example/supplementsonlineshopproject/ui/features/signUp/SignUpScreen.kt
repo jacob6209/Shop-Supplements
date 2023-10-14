@@ -71,6 +71,7 @@ fun SignUpScreen() {
     val context= LocalContext.current
     val navigation= getNavController()
     val viewModel= getNavViewModel<SignUpViewModel>()
+    clearInputs(viewModel)
     Box{
 
 
@@ -249,6 +250,7 @@ fun MainTextField(
     onValueChange: (String) -> Unit
 ) {
     OutlinedTextField(
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
         label = {Text(hint)},
         value = edtValue,
         singleLine = true,
@@ -292,5 +294,13 @@ fun PasswordTextField(edtValue: String, icon: Int, hint: String, onValueChanges:
 
         }
     )
+
+}
+
+fun clearInputs(viewModel: SignUpViewModel){
+    viewModel.username.value=""
+    viewModel.email.value=""
+    viewModel.password.value=""
+    viewModel.confirmPassword.value=""
 
 }

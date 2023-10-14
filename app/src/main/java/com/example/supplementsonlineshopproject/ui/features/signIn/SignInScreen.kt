@@ -35,6 +35,7 @@ import androidx.compose.ui.window.Popup
 import androidx.navigation.NavController
 import com.example.supplementsonlineshopproject.R
 import com.example.supplementsonlineshopproject.ui.features.IntroScreen
+import com.example.supplementsonlineshopproject.ui.features.signUp.SignUpViewModel
 import com.example.supplementsonlineshopproject.ui.theme.*
 import com.example.supplementsonlineshopproject.util.MyScreens
 import com.example.supplementsonlineshopproject.util.NetworkChecker
@@ -70,6 +71,7 @@ fun SignInScreen() {
     val context= LocalContext.current
     val navigation= getNavController()
     val viewModel= getNavViewModel<SignInViewModel>()
+    clearInputs(viewModel)
     Box{
 
 
@@ -255,6 +257,7 @@ fun MainTextField(
     onValueChange: (String) -> Unit
 ) {
     OutlinedTextField(
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
         label = {Text(hint)},
         value = edtValue,
         singleLine = true,
@@ -298,5 +301,11 @@ fun PasswordTextField(edtValue: String, icon: Int, hint: String, onValueChanges:
 
         }
     )
+
+}
+
+fun clearInputs(viewModel: SignInViewModel){
+    viewModel.email.value=""
+    viewModel.password.value=""
 
 }
