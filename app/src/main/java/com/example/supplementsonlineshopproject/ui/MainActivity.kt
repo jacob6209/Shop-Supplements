@@ -19,6 +19,7 @@ import com.example.supplementsonlineshopproject.ui.features.IntroScreen
 import com.example.supplementsonlineshopproject.ui.features.category.CategoryScreen
 //import com.example.supplementsonlineshopproject.ui.features.category.CategoryScreen
 import com.example.supplementsonlineshopproject.ui.features.main.MainScreen
+import com.example.supplementsonlineshopproject.ui.features.product.ProductScreen
 import com.example.supplementsonlineshopproject.ui.features.resetPassword.RestPasswordScreen
 import com.example.supplementsonlineshopproject.ui.features.signIn.SignInScreen
 import com.example.supplementsonlineshopproject.ui.features.signUp.SignUpScreen
@@ -130,11 +131,6 @@ fun ProfileScreen() {
 }
 
 
-
-@Composable
-fun ProductScreen(ProductId:String) {
-
-}
 
 
 

@@ -13,6 +13,7 @@ import com.example.supplementsonlineshopproject.model.repository.user.UserReposi
 import com.example.supplementsonlineshopproject.model.repository.user.UserRepositoryImpl
 import com.example.supplementsonlineshopproject.ui.features.category.CategoryViewModel
 import com.example.supplementsonlineshopproject.ui.features.main.MainViewModel
+import com.example.supplementsonlineshopproject.ui.features.product.ProductViewModel
 import com.example.supplementsonlineshopproject.ui.features.resetPassword.ResetPasswordViewModel
 import com.example.supplementsonlineshopproject.ui.features.signIn.SignInViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -30,6 +31,7 @@ val myModules= module {
     viewModel{SignUpViewModel(get())}
     viewModel{SignInViewModel(get())}
     viewModel{ResetPasswordViewModel()}
-    viewModel{ CategoryViewModel(get()) }
+    viewModel{ CategoryViewModel(get())}
     viewModel{(isNetConnected:Boolean)->MainViewModel(get(),isNetConnected)}
+    viewModel{ProductViewModel()}
 }
