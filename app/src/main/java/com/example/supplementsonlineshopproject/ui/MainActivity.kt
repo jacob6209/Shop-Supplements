@@ -80,10 +80,10 @@ fun SupplementsUi(){
         composable(
             route = MyScreens.ProductScreen.route+"/"+ "{$KEY_PRODUCT_ARG}",
             arguments = listOf(navArgument(KEY_PRODUCT_ARG){
-                type= NavType.StringType
+                type= NavType.IntType
             })
         ){
-            ProductScreen(it.arguments!!.getString(KEY_PRODUCT_ARG,"null")) //id Product
+            ProductScreen(it.arguments!!.getInt(KEY_PRODUCT_ARG,1)) //id Product
         }
 
 

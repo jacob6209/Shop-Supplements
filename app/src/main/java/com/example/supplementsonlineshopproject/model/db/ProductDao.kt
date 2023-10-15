@@ -17,9 +17,10 @@ interface ProductDao {
     suspend fun getAll(): List<ProductResponse>
 
     @Query("SELECT * FROM Product_tabel WHERE id=:productId")
-    suspend fun getByid(productId:Int): ProductResponse
+    suspend fun getProductById(productId:Int): ProductResponse
     @Query("SELECT * FROM Product_tabel WHERE category_title=:category")
     suspend fun getAllByCategory(category:String):List<ProductResponse>
+
 
 
 }

@@ -33,5 +33,5 @@ val myModules= module {
     viewModel{ResetPasswordViewModel()}
     viewModel{ CategoryViewModel(get())}
     viewModel{(isNetConnected:Boolean)->MainViewModel(get(),isNetConnected)}
-    viewModel{ProductViewModel()}
+    viewModel{ProductViewModel(get())}
 }

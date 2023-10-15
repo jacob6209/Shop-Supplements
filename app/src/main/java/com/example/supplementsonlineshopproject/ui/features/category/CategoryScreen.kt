@@ -92,7 +92,7 @@ fun CategoryItem(data: ProductResponse, onProductClicked: (Int) -> Unit,modifier
         ) {
         Column {
 ///----------------------------------------------------------------------
-//            SliderBanner(data,modifier)
+
 //--------------------------------------------------------------------------------
             AsyncImage(
                 model = BASE_URL+data.images.firstOrNull()?.image,
@@ -180,73 +180,3 @@ fun CategoryToolBar(categoryName: String,) {
 }
 
 
-//---------------------------------------------------------
-@ExperimentalPagerApi
-@Composable
-fun SliderBanner(
-    data: ProductResponse,
-    modifier: Modifier = Modifier
-) {
-    val pagerState = rememberPagerState(initialPage = 0)
-
-    LaunchedEffect(Unit) {
-        while (true) {
-            kotlinx.coroutines.yield()
-            delay(2600)
-            pagerState.animateScrollToPage(
-                page = (pagerState.currentPage + 1) % (pagerState.pageCount)
-            )
-        }
-    }
-
-    Column {
-        HorizontalPager(
-            count = data.images.size,
-            state = pagerState,
-            contentPadding = PaddingValues(horizontal = DIMENS_16dp),
-            modifier = modifier
-                .height(DIMENS_114dp)
-                .fillMaxWidth()
-        ) { page ->
-            Card(
-                shape = RoundedCornerShape(DIMENS_12dp),
-                modifier = Modifier
-                    .graphicsLayer {
-                        val pageOffset = calculateCurrentOffsetForPage(page).absoluteValue
-
-                        lerp(
-                            start = 0.85f,
-                            stop = 1f,
-                            fraction = 1f - pageOffset.coerceIn(0f, 1f)
-                        ).also { scale ->
-                            scaleX = scale
-                            scaleY = scale
-                        }
-
-                        alpha = lerp(
-                            start = 0.5f,
-                            stop = 1f,
-                            fraction = 1f - pageOffset.coerceIn(0f, 1f)
-                        )
-                    }
-            ) {
-
-                AsyncImage(
-                model = BASE_URL+data.images[page].image,
-                contentDescription = null,
-                contentScale = ContentScale.FillWidth,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-            )
-            }
-        }
-
-        HorizontalPagerIndicator(
-            pagerState = pagerState,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(DIMENS_16dp)
-        )
-    }
-}
