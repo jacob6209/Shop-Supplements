@@ -7,6 +7,8 @@ import android.content.Context
 import androidx.room.Room
 import com.example.supplementsonlineshopproject.model.db.AppDatabase
 import com.example.supplementsonlineshopproject.model.net.CreateApiService
+import com.example.supplementsonlineshopproject.model.repository.comment.CommentRepository
+import com.example.supplementsonlineshopproject.model.repository.comment.CommntRepositoryImpl
 import com.example.supplementsonlineshopproject.model.repository.product.ProductRepository
 import com.example.supplementsonlineshopproject.model.repository.product.ProductRepositoryImpl
 import com.example.supplementsonlineshopproject.model.repository.user.UserRepository
@@ -28,10 +30,11 @@ val myModules= module {
     single<UserRepository>{UserRepositoryImpl(get(),get())}
     single { Room.databaseBuilder(androidContext(),AppDatabase::class.java,"app_dataBase.db").build()}
     single<ProductRepository>{ProductRepositoryImpl(get(),get<AppDatabase>().productDao())}
+    single<CommentRepository>{CommntRepositoryImpl(get())}
     viewModel{SignUpViewModel(get())}
     viewModel{SignInViewModel(get())}
     viewModel{ResetPasswordViewModel()}
     viewModel{ CategoryViewModel(get())}
     viewModel{(isNetConnected:Boolean)->MainViewModel(get(),isNetConnected)}
-    viewModel{ProductViewModel(get())}
+    viewModel{ProductViewModel(get(),get())}
 }

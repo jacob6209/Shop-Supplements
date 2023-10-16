@@ -1,31 +1,40 @@
 package com.example.supplementsonlineshopproject.ui.features.product
 
 import android.icu.text.CaseMap.Title
+import android.media.tv.CommandResponse
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Badge
 import androidx.compose.material.BadgedBox
 import androidx.compose.material.Card
+import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -38,6 +47,9 @@ import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,14 +59,19 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
+import com.example.supplementsonlineshopproject.R
 import com.example.supplementsonlineshopproject.model.data.AdsResponse
+import com.example.supplementsonlineshopproject.model.data.Comment
 import com.example.supplementsonlineshopproject.model.data.ProductResponse
 import com.example.supplementsonlineshopproject.ui.theme.BackgroundMain
 import com.example.supplementsonlineshopproject.ui.theme.Blue
@@ -105,7 +122,7 @@ fun ProductScreen(productId: Int) {
     val uiController = rememberSystemUiController()
     val navigation = getNavController()
     val viewModel = getNavViewModel<ProductViewModel>()
-    viewModel.loadData(productId)
+    viewModel.loadData(productId, NetworkChecker(context).isInternetConnected)
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -121,18 +138,31 @@ fun ProductScreen(productId: Int) {
             ProductToolbar(
                 productName = "Datail",
                 badgeNumber = 0,
-                OnBackClicked = {navigation.popBackStack()},
+                OnBackClicked = { navigation.popBackStack() },
                 OnCartClicked = {
-                    if (NetworkChecker(context).isInternetConnected){
+                    if (NetworkChecker(context).isInternetConnected) {
                         navigation.navigate(MyScreens.CartScreen.route)
-                    }else{
-                        Toast.makeText(context, "Check Your Internet Connection", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "Check Your Internet Connection",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             )
-            ProductItem(viewModel.thisProduct.value!!, OnCategoryClicked = {
-                navigation.navigate(MyScreens.CategoryScreen.route+"/"+it)
-            }, modifier = Modifier)
+            val allComments: List<Comment> = viewModel.ProductResponseComments.value.comments
+            ProductItem(
+                comments = allComments,
+                data = viewModel.thisProduct.value,
+                OnCategoryClicked = {
+                    navigation.navigate(MyScreens.CategoryScreen.route + "/" + it)
+                }, modifier = Modifier
+            )
+
+            ProductComment(allComments) {
+
+            }
 
         }
 
@@ -142,17 +172,245 @@ fun ProductScreen(productId: Int) {
 }
 
 @Composable
-fun ProductItem(data: ProductResponse,OnCategoryClicked: (String) -> Unit,modifier: Modifier) {
-    Column(
-        modifier =Modifier.padding(16.dp)
+fun CommentBody(comment: Comment) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, end = 16.dp, top = 8.dp),
+        elevation = 0.dp,
+        border = BorderStroke(1.dp, color = Color.LightGray),
+        shape = Shapes.large
     ) {
-        ProductDesign(data,OnCategoryClicked,modifier)
+        Column(modifier = Modifier.padding(12.dp)) {
+            Text(
+                text = comment.name,
+                style = TextStyle(fontSize = 15.sp),
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = comment.body,
+                modifier = Modifier.padding(top = 10.dp),
+                style = TextStyle(fontSize = 14.sp)
+            )
+        }
+
+    }
+
+}
+
+@Composable
+fun ProductComment(comment: List<Comment>, AddNewComment: (String) -> Unit) {
+    val ShowCommentDialog = remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    if (comment.isNotEmpty()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Text(
+                text = "Comments",
+                style = (TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Medium))
+            )
+            TextButton(onClick = {
+                if (NetworkChecker(context).isInternetConnected) {
+                    ShowCommentDialog.value = true
+                } else {
+                    Toast.makeText(
+                        context,
+                        "Please Check Your Internet Connection!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }) {
+                Text(
+                    text = "Add Comment",
+                    style = TextStyle(fontSize = 14.sp)
+
+                )
+            }
+
+        }
+
+        comment.forEach {
+            CommentBody(it)
+        }
+    } else {
+        TextButton(onClick = {
+            if (NetworkChecker(context).isInternetConnected) {
+                ShowCommentDialog.value = true
+            } else {
+                Toast.makeText(
+                    context,
+                    "Please Check Your Internet Connection!",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }) {
+            Text(
+                text = "Add Comment",
+                style = TextStyle(fontSize = 14.sp)
+
+            )
+        }
+
+    }
+
+    if (ShowCommentDialog.value) {
+        AddNewCommentDialog(
+            OnDismiss = { ShowCommentDialog.value = false },
+            OnPositiveClicked = { AddNewComment.invoke(it) })
+    }
+
+
+}
+
+@Composable
+fun AddNewCommentDialog(
+    OnDismiss: () -> Unit,
+    OnPositiveClicked: (String) -> Unit
+
+) {
+    val userComment = remember { mutableStateOf("") }
+    val context = LocalContext.current
+    Dialog(onDismissRequest = { OnDismiss }) {
+        Card(
+            modifier = Modifier
+                .fillMaxHeight(.49f),
+            elevation = 8.dp,
+            shape = Shapes.medium
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Write Your Comment ",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    textAlign = TextAlign.Center,
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                MainTextComment(edtValue = userComment.value, hint = "Write Something") {
+                    userComment.value = it
+                }
+                Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
+                    TextButton(onClick = { OnDismiss.invoke() }) { Text(text = "Cancel") }
+                    Spacer(modifier = Modifier.width(4.dp))
+                    TextButton(onClick = {
+                        if (userComment.value.isNotEmpty() && userComment.value.isNotBlank()) {
+                            if (NetworkChecker(context).isInternetConnected) {
+                                OnPositiveClicked.invoke(userComment.value)
+                                OnDismiss.invoke()
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    "Check Your Internet Connection",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "Comment Can Not be Empty,Write Something...",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }) {
+                        Text(text = "Ok")
+                    }
+                }
+            }
+        }
     }
 }
+
+@Composable
+fun ProductItem(
+    comments: List<Comment>,
+    data: ProductResponse,
+    OnCategoryClicked: (String) -> Unit,
+    modifier: Modifier
+) {
+    Column(
+        modifier = Modifier.padding(16.dp)
+    ) {
+        ProductDesign(data, OnCategoryClicked, modifier)
+        Divider(
+            color = Color.LightGray,
+            thickness = 1.dp,
+            modifier = Modifier.padding(top = 4.dp, bottom = 4.dp)
+        )
+        ProdactDetail(data, comments.size.toString())
+        Divider(
+            color = Color.LightGray,
+            thickness = 1.dp,
+            modifier = Modifier.padding(top = 4.dp, bottom = 4.dp)
+        )
+
+    }
+}
+
+@Composable
+fun ProdactDetail(data: ProductResponse, CommentNumber: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Image(
+                painter = painterResource(id = R.drawable.rating1),
+                contentDescription = null,
+                modifier = Modifier.size(70.dp)
+            )
+            Text(
+                text = "${data.average_rating} Rate",
+                modifier = Modifier.padding(start = 6.dp),
+                fontSize = 13.sp
+            )
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Image(
+                painter = painterResource(id = R.drawable.comment1),
+                contentDescription = null,
+                modifier = Modifier.size(26.dp)
+            )
+            Text(
+                text = "$CommentNumber Comments",
+                modifier = Modifier.padding(start = 6.dp),
+                fontSize = 13.sp
+            )
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Image(
+                painter = painterResource(id = R.drawable.shaping3),
+                contentDescription = null,
+                modifier = Modifier.size(26.dp)
+            )
+            Text(
+                text = "${data.soled_item} Sold",
+                modifier = Modifier.padding(start = 6.dp),
+                fontSize = 13.sp
+            )
+        }
+
+
+    }
+}
+
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun ProductDesign(data:ProductResponse,OnCategoryClicked:(String)->Unit,modifier: Modifier) {
-    SliderBanner(data,modifier)
+fun ProductDesign(data: ProductResponse, OnCategoryClicked: (String) -> Unit, modifier: Modifier) {
+    SliderBanner(data, modifier)
     Text(
         modifier = Modifier.padding(top = 14.dp),
         text = data.title,
@@ -163,8 +421,8 @@ fun ProductDesign(data:ProductResponse,OnCategoryClicked:(String)->Unit,modifier
         text = data.description,
         style = TextStyle(fontSize = 15.sp, textAlign = TextAlign.Justify)
     )
-    
-    TextButton(onClick = { OnCategoryClicked.invoke(data.category_title)}) {
+
+    TextButton(onClick = { OnCategoryClicked.invoke(data.category_title) }) {
         Text(text = "#" + data.category_title, style = TextStyle(fontSize = 13.sp))
     }
 
@@ -273,7 +531,7 @@ fun SliderBanner(
             ) {
 
                 AsyncImage(
-                    model = BASE_URL+data.images[page].image,
+                    model = BASE_URL + data.images[page].image,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -293,6 +551,25 @@ fun SliderBanner(
 }
 
 
+@Composable
+fun MainTextComment(
+    edtValue: String,
+    hint: String,
+    onValueChange: (String) -> Unit,
+)
+{
+    OutlinedTextField(
+        label = {Text(hint)},
+        value = edtValue,
+        singleLine = false,
+        maxLines = 2,
+        onValueChange = onValueChange,
+        placeholder = {Text(text = "Write Something...")},
+        modifier = Modifier
+            .fillMaxWidth(0.9f),
+        shape = Shapes.medium,
+    )
+}
 
 
 

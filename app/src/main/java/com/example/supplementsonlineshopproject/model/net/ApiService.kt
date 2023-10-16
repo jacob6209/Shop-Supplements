@@ -18,6 +18,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface ApiService {
     @POST("users/")
@@ -35,6 +36,9 @@ interface ApiService {
     suspend fun getAllProducts():Response<List<ProductResponse>>
     @GET("store/getads/")
     suspend fun getAds():Response<List<AdsResponse>>
+
+    @GET("store/products/{productId}")
+    suspend fun getSpecificProductWithComments(@Path("productId") productId: Int):ProductResponse
 
 }
 
