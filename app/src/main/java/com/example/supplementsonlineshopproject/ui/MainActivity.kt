@@ -71,7 +71,7 @@ fun SupplementsUi(){
         startDestination = MyScreens.MainScreen.route,
     ){
         composable(MyScreens.MainScreen.route){
-             if (TokenInMemory.access != null){
+             if (TokenInMemory.accessToken != null){
                 MainScreen()
             }else
                 IntroScreen()

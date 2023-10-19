@@ -1,6 +1,7 @@
 package com.example.supplementsonlineshopproject.model.net
 
 import android.util.Log
+import com.example.supplementsonlineshopproject.model.data.AddNewCommentResponse
 import com.example.supplementsonlineshopproject.model.data.AdsResponse
 import com.example.supplementsonlineshopproject.model.data.LoginResponse
 import com.example.supplementsonlineshopproject.model.data.PassResetResponse
@@ -37,8 +38,10 @@ interface ApiService {
     @GET("store/getads/")
     suspend fun getAds():Response<List<AdsResponse>>
 
-    @GET("store/products/{productId}")
+    @GET("store/products/{productId}/")
     suspend fun getSpecificProductWithComments(@Path("productId") productId: Int):ProductResponse
+    @POST("store/products/{productId}/comments/")
+    suspend fun addNewcomment(@Path("productId") id: Int,@Body jsonObject: JsonObject):AddNewCommentResponse
 
 }
 
@@ -48,15 +51,18 @@ fun CreateApiService():ApiService{
         .addInterceptor {
             val oldRequest = it.request()
             val newRequest = oldRequest.newBuilder()
-            // to do=> remove JWT header Type
-            if (TokenInMemory.access != null){
-//                newRequest.addHeader("Authorization",TokenInMemory.access!!)
-                newRequest.addHeader("Authorization", "JWT" + TokenInMemory.access!!)
+            val pathSegments = oldRequest.url.encodedPathSegments
+           if (TokenInMemory.accessToken != null &&  pathSegments.isNotEmpty() && pathSegments.contains("comments")  ) {
+                newRequest.addHeader("Authorization", "JWT " + TokenInMemory.accessToken!!)
+            }else if(TokenInMemory.accessToken != null){
+                newRequest.addHeader("Authorization", "JWT" + TokenInMemory.accessToken!!)
             }
                 newRequest.addHeader("Accept", "application/json")
                 newRequest.method(oldRequest.method, oldRequest.body)
             return@addInterceptor it.proceed(newRequest.build())
-        }.build()
+        }
+        .authenticator(AuthChecker())
+        .build()
 
 
     val retrofit=Retrofit.Builder()

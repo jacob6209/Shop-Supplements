@@ -2,17 +2,18 @@ package com.example.supplementsonlineshopproject.model.repository
 
 object TokenInMemory {
 
-    var email: String? = null
+    var userEmail: String? = null
         private set
 
-
-    var refresh:String?=null
+    var refreshToken: String? = null
         private set
-    var access:String?=null
 
-    fun refreshToken(refresh:String?,access:String?) {
-        this.refresh=refresh
-        this.access=access
+    var accessToken: String? = null
+
+    fun saveTokens(userEmail: String?,accessToken: String?, refreshToken: String?) {
+        this.userEmail = userEmail
+        this.accessToken = accessToken
+        this.refreshToken = refreshToken
     }
 
 }

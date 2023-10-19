@@ -48,7 +48,7 @@ class UserRepositoryImpl(
             val result = apiService.signIn(jsonObject)
 
             if (result.access.isNotEmpty()) {
-                TokenInMemory.refreshToken(result.refresh, result.access)
+                TokenInMemory.saveTokens(email,result.refresh, result.access)
                 saveToken(result.access)
                 saveRefreshToken(result.refresh)
                 return VALUE_SUCCESS
@@ -76,7 +76,7 @@ class UserRepositoryImpl(
     }
 
     override fun signOut() {
-        TokenInMemory.refreshToken(null,null)
+        TokenInMemory.saveTokens(null,null,null)
         sharedPref.edit().clear().apply()
     }
 
@@ -94,7 +94,7 @@ class UserRepositoryImpl(
 
 
     override fun loadToken() {
-        TokenInMemory.refreshToken(getToken(),getRefreshToken())
+        TokenInMemory.saveTokens(getEmail(),getToken(),getRefreshToken())
         Log.d("TokenLoading", "Token loaded: ${TokenInMemory}()")
     }
 

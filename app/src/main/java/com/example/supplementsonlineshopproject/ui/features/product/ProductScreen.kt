@@ -32,22 +32,16 @@ import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -56,13 +50,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -70,36 +61,28 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import com.example.supplementsonlineshopproject.R
-import com.example.supplementsonlineshopproject.model.data.AdsResponse
 import com.example.supplementsonlineshopproject.model.data.Comment
 import com.example.supplementsonlineshopproject.model.data.ProductResponse
 import com.example.supplementsonlineshopproject.ui.theme.BackgroundMain
-import com.example.supplementsonlineshopproject.ui.theme.Blue
-import com.example.supplementsonlineshopproject.ui.theme.CardViewBackgroundItem
-import com.example.supplementsonlineshopproject.ui.theme.DIMENS_114dp
 import com.example.supplementsonlineshopproject.ui.theme.DIMENS_12dp
 import com.example.supplementsonlineshopproject.ui.theme.DIMENS_16dp
 import com.example.supplementsonlineshopproject.ui.theme.MainAppTheme
 import com.example.supplementsonlineshopproject.ui.theme.Shapes
 import com.example.supplementsonlineshopproject.util.BASE_URL
-import com.example.supplementsonlineshopproject.util.CATEGORY
 import com.example.supplementsonlineshopproject.util.MyScreens
 import com.example.supplementsonlineshopproject.util.NetworkChecker
-import com.example.supplementsonlineshopproject.util.TAGS
 import com.example.supplementsonlineshopproject.util.lerp
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
 import com.google.accompanist.pager.calculateCurrentOffsetForPage
 import com.google.accompanist.pager.rememberPagerState
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dev.burnoo.cokoin.navigation.getNavController
 import dev.burnoo.cokoin.navigation.getNavViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.yield
-import org.koin.core.parameter.parametersOf
-import java.nio.file.WatchEvent
 import kotlin.math.absoluteValue
+
 
 @Preview(showBackground = true)
 @Composable
@@ -119,7 +102,6 @@ fun ProductScreenPreview() {
 @Composable
 fun ProductScreen(productId: Int) {
     val context = LocalContext.current
-    val uiController = rememberSystemUiController()
     val navigation = getNavController()
     val viewModel = getNavViewModel<ProductViewModel>()
     viewModel.loadData(productId, NetworkChecker(context).isInternetConnected)
@@ -152,17 +134,23 @@ fun ProductScreen(productId: Int) {
                 }
             )
             val allComments: List<Comment> = viewModel.ProductResponseComments.value.comments
+            val sortedComments=allComments.sortedByDescending{  it.id }
             ProductItem(
-                comments = allComments,
+                comments = sortedComments,
                 data = viewModel.thisProduct.value,
                 OnCategoryClicked = {
                     navigation.navigate(MyScreens.CategoryScreen.route + "/" + it)
-                }, modifier = Modifier
+                }, modifier = Modifier,
+                OnAddNewComment = { name, body, rating ->
+                    viewModel.addNewComment(productId, name , body  , rating, onSuccess = {
+                        Toast.makeText(context, "Comment Added Successfully", Toast.LENGTH_SHORT).show()
+                    }, onError = {error ->
+                        Toast.makeText(context,"Failed to add : $error", Toast.LENGTH_SHORT).show()
+                    })
+                }
             )
 
-            ProductComment(allComments) {
 
-            }
 
         }
 
@@ -177,8 +165,8 @@ fun CommentBody(comment: Comment) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 16.dp, end = 16.dp, top = 8.dp),
-        elevation = 0.dp,
-        border = BorderStroke(1.dp, color = Color.LightGray),
+        elevation = 3.dp,
+        border = BorderStroke(0.dp, color = Color.LightGray),
         shape = Shapes.large
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
@@ -199,17 +187,20 @@ fun CommentBody(comment: Comment) {
 }
 
 @Composable
-fun ProductComment(comment: List<Comment>, AddNewComment: (String) -> Unit) {
+fun ProductComment(comment: List<Comment>, AddNewComment: (name:String,body:String,rating:Int) -> Unit) {
     val ShowCommentDialog = remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     if (comment.isNotEmpty()) {
         Row(
-            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp), horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
 
             Text(
+
                 text = "Comments",
                 style = (TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Medium))
             )
@@ -260,7 +251,10 @@ fun ProductComment(comment: List<Comment>, AddNewComment: (String) -> Unit) {
     if (ShowCommentDialog.value) {
         AddNewCommentDialog(
             OnDismiss = { ShowCommentDialog.value = false },
-            OnPositiveClicked = { AddNewComment.invoke(it) })
+            OnPositiveClicked = { name, body, rating ->
+                AddNewComment.invoke(name, body, rating)
+            }
+        )
     }
 
 
@@ -269,15 +263,18 @@ fun ProductComment(comment: List<Comment>, AddNewComment: (String) -> Unit) {
 @Composable
 fun AddNewCommentDialog(
     OnDismiss: () -> Unit,
-    OnPositiveClicked: (String) -> Unit
+    OnPositiveClicked: (name:String,body:String,rating:Int) -> Unit
 
 ) {
     val userComment = remember { mutableStateOf("") }
+    val userName = remember { mutableStateOf("") }
+    val userRating = remember { mutableStateOf(4) }
+
     val context = LocalContext.current
     Dialog(onDismissRequest = { OnDismiss }) {
         Card(
             modifier = Modifier
-                .fillMaxHeight(.49f),
+                .fillMaxHeight(.65f),
             elevation = 8.dp,
             shape = Shapes.medium
         ) {
@@ -297,17 +294,24 @@ fun AddNewCommentDialog(
                         .padding(8.dp),
                     textAlign = TextAlign.Center,
                 )
-                Spacer(modifier = Modifier.height(8.dp))
-                MainTextComment(edtValue = userComment.value, hint = "Write Something") {
+                Spacer(modifier = Modifier.height(4.dp))
+                MainTextComment(edtValue = userName.value, hint = "Name") {
+                    userName.value = it
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                MainTextComment(edtValue = userComment.value, hint = "Your Comment") {
                     userComment.value = it
                 }
+//                =====================================
+                CustomRatingBar(modifier = Modifier, rating = 4.5f, spaceBetween = 5.dp)
+
                 Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
                     TextButton(onClick = { OnDismiss.invoke() }) { Text(text = "Cancel") }
                     Spacer(modifier = Modifier.width(4.dp))
                     TextButton(onClick = {
-                        if (userComment.value.isNotEmpty() && userComment.value.isNotBlank()) {
+                        if (userComment.value.isNotEmpty() && userComment.value.isNotBlank()&&userName.value.isNotEmpty() && userName.value.isNotBlank()) {
                             if (NetworkChecker(context).isInternetConnected) {
-                                OnPositiveClicked.invoke(userComment.value)
+                                OnPositiveClicked.invoke(userName.value,userComment.value,userRating.value)
                                 OnDismiss.invoke()
                             } else {
                                 Toast.makeText(
@@ -337,7 +341,8 @@ fun ProductItem(
     comments: List<Comment>,
     data: ProductResponse,
     OnCategoryClicked: (String) -> Unit,
-    modifier: Modifier
+    modifier: Modifier,
+    OnAddNewComment:(name:String,body:String,rating:Int)->Unit,
 ) {
     Column(
         modifier = Modifier.padding(16.dp)
@@ -354,6 +359,7 @@ fun ProductItem(
             thickness = 1.dp,
             modifier = Modifier.padding(top = 4.dp, bottom = 4.dp)
         )
+        ProductComment(comments,OnAddNewComment)
 
     }
 }
@@ -365,7 +371,6 @@ fun ProdactDetail(data: ProductResponse, CommentNumber: String) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(
                 painter = painterResource(id = R.drawable.rating1),
@@ -392,12 +397,12 @@ fun ProdactDetail(data: ProductResponse, CommentNumber: String) {
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(
-                painter = painterResource(id = R.drawable.shaping3),
+                painter = painterResource(id = R.drawable.stock2),
                 contentDescription = null,
                 modifier = Modifier.size(26.dp)
             )
             Text(
-                text = "${data.soled_item} Sold",
+                text = "${data.inventory} Stock",
                 modifier = Modifier.padding(start = 6.dp),
                 fontSize = 13.sp
             )
@@ -558,18 +563,26 @@ fun MainTextComment(
     onValueChange: (String) -> Unit,
 )
 {
+    val maxLength = 200
     OutlinedTextField(
         label = {Text(hint)},
         value = edtValue,
         singleLine = false,
         maxLines = 2,
-        onValueChange = onValueChange,
+//        onValueChange = onValueChange,
+        onValueChange = {
+            // Check and limit the length if needed
+            if (it.length <= maxLength) {
+                onValueChange(it)
+            }
+        },
         placeholder = {Text(text = "Write Something...")},
         modifier = Modifier
             .fillMaxWidth(0.9f),
         shape = Shapes.medium,
     )
 }
+
 
 
 
