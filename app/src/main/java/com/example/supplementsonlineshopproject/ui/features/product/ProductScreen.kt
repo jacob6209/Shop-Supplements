@@ -1,12 +1,9 @@
 package com.example.supplementsonlineshopproject.ui.features.product
 
-import android.icu.text.CaseMap.Title
-import android.media.tv.CommandResponse
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,15 +13,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Badge
 import androidx.compose.material.BadgedBox
@@ -44,6 +37,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -270,6 +264,7 @@ fun AddNewCommentDialog(
     val userName = remember { mutableStateOf("") }
     val userRating = remember { mutableStateOf(4) }
 
+
     val context = LocalContext.current
     Dialog(onDismissRequest = { OnDismiss }) {
         Card(
@@ -294,16 +289,26 @@ fun AddNewCommentDialog(
                         .padding(8.dp),
                     textAlign = TextAlign.Center,
                 )
-                Spacer(modifier = Modifier.height(4.dp))
-                MainTextComment(edtValue = userName.value, hint = "Name") {
+//                Spacer(modifier = Modifier.height(2.dp))
+                MainTextComment(singleLine = true,maxLength = 20,edtValue = userName.value, hint = "Name") {
                     userName.value = it
                 }
-                Spacer(modifier = Modifier.height(4.dp))
-                MainTextComment(edtValue = userComment.value, hint = "Your Comment") {
+//                Spacer(modifier = Modifier.height(2.dp))
+                MainTextComment(singleLine = false,maxLength = 200, edtValue = userComment.value, hint = "Your Comment") {
                     userComment.value = it
                 }
 //                =====================================
-                CustomRatingBar(modifier = Modifier, rating = 4.5f, spaceBetween = 5.dp)
+//                CustomRatingBar(modifier = Modifier, rating = 4.5f, spaceBetween = 5.dp)
+               Row (modifier = Modifier
+                   .fillMaxWidth()
+                   .padding(start = 16.dp, end = 16.dp),
+                   horizontalArrangement = Arrangement.SpaceBetween,
+                   verticalAlignment = Alignment.CenterVertically,
+
+               ){
+                   Text(modifier = Modifier.padding(4.dp), text = "Rate:", fontWeight = FontWeight.Bold)
+                   RatingBar(currentRating = userRating.value,onRatingChanged = { userRating.value = it })
+               }
 
                 Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
                     TextButton(onClick = { OnDismiss.invoke() }) { Text(text = "Cancel") }
@@ -558,16 +563,18 @@ fun SliderBanner(
 
 @Composable
 fun MainTextComment(
+    singleLine:Boolean,
+    maxLength: Int = 200,
     edtValue: String,
     hint: String,
     onValueChange: (String) -> Unit,
+
 )
 {
-    val maxLength = 200
     OutlinedTextField(
         label = {Text(hint)},
         value = edtValue,
-        singleLine = false,
+        singleLine = singleLine,
         maxLines = 2,
 //        onValueChange = onValueChange,
         onValueChange = {

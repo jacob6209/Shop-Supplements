@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace 'com.example.supplementsonlineshopproject'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.example.supplementsonlineshopproject"
@@ -101,4 +101,6 @@ dependencies {
     implementation "com.google.accompanist:accompanist-pager-indicators:0.28.0"
 
     implementation "com.google.accompanist:accompanist-coil:0.15.0"
+// for touchabel rating bar
+//    implementation 'androidx.compose.material:material-icons-extended-android:1.6.0-alpha07'
 }
