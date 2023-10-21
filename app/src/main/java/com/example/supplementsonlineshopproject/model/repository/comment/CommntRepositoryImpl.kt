@@ -1,11 +1,7 @@
 package com.example.supplementsonlineshopproject.model.repository.comment
 
-import android.util.Log
-import com.example.supplementsonlineshopproject.model.data.AddNewCommentResponse
-import com.example.supplementsonlineshopproject.model.data.Comment
 import com.example.supplementsonlineshopproject.model.data.ProductResponse
 import com.example.supplementsonlineshopproject.model.net.ApiService
-import com.example.supplementsonlineshopproject.model.repository.product.ProductRepository
 import com.example.supplementsonlineshopproject.util.CommentException
 import com.example.supplementsonlineshopproject.util.EMPTY_PRODUCT
 import com.google.gson.JsonObject

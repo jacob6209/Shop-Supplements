@@ -1,9 +1,11 @@
 package com.example.supplementsonlineshopproject.ui.features.product
 
+import android.os.Build
+import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,6 +37,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -73,11 +76,15 @@ import com.google.accompanist.pager.calculateCurrentOffsetForPage
 import com.google.accompanist.pager.rememberPagerState
 import dev.burnoo.cokoin.navigation.getNavController
 import dev.burnoo.cokoin.navigation.getNavViewModel
+import getTimeAgo
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.yield
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import kotlin.math.absoluteValue
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun ProductScreenPreview() {
@@ -93,11 +100,13 @@ fun ProductScreenPreview() {
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ProductScreen(productId: Int) {
     val context = LocalContext.current
     val navigation = getNavController()
     val viewModel = getNavViewModel<ProductViewModel>()
+    var showAnimation by remember { mutableStateOf(false) }
     viewModel.loadData(productId, NetworkChecker(context).isInternetConnected)
 
     Box(
@@ -105,69 +114,109 @@ fun ProductScreen(productId: Int) {
         contentAlignment = Alignment.BottomCenter
 
     ) {
-        Column(
-            modifier = Modifier
+        Box {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(bottom = 58.dp)
+            ) {
+                ProductToolbar(
+                    productName = "Datail",
+                    badgeNumber = 0,
+                    OnBackClicked = { navigation.popBackStack() },
+                    OnCartClicked = {
+                        if (NetworkChecker(context).isInternetConnected) {
+                            navigation.navigate(MyScreens.CartScreen.route)
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "Check Your Internet Connection",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                )
+                val allComments: List<Comment> = viewModel.ProductResponseComments.value.comments
+                val sortedComments=allComments.sortedByDescending{  it.id }
+                ProductItem(
+                    comments = sortedComments,
+                    data = viewModel.thisProduct.value,
+                    OnCategoryClicked = {
+                        navigation.navigate(MyScreens.CategoryScreen.route + "/" + it)
+                    }, modifier = Modifier,
+                    OnAddNewComment = { name, body, rating ->
+                        viewModel.addNewComment(productId, name , body  , rating, onSuccess = {
+                            showAnimation = true
+//                         Toast.makeText(context, "Comment Added Successfully", Toast.LENGTH_SHORT).show()
+                        }, onError = {error ->
+                            Toast.makeText(context,"Failed to add : $error", Toast.LENGTH_SHORT).show()
+                        })
+                    }
+
+                )
+
+            }
+            Box (modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(bottom = 58.dp)
-        ) {
-            ProductToolbar(
-                productName = "Datail",
-                badgeNumber = 0,
-                OnBackClicked = { navigation.popBackStack() },
-                OnCartClicked = {
-                    if (NetworkChecker(context).isInternetConnected) {
-                        navigation.navigate(MyScreens.CartScreen.route)
-                    } else {
-                        Toast.makeText(
-                            context,
-                            "Check Your Internet Connection",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                .padding(
+                    16.dp
+                ),
+                contentAlignment = Alignment.Center
+            ) {
+
+                if (showAnimation) {
+                    LottieAnimationComponentSentSuccess()
+                }
+                LaunchedEffect(showAnimation) {
+                        // Delay for 3 seconds before hiding the animation
+                        delay(2000) // Delay for 3 seconds, adjust as needed
+                        showAnimation = false
                     }
                 }
-            )
-            val allComments: List<Comment> = viewModel.ProductResponseComments.value.comments
-            val sortedComments=allComments.sortedByDescending{  it.id }
-            ProductItem(
-                comments = sortedComments,
-                data = viewModel.thisProduct.value,
-                OnCategoryClicked = {
-                    navigation.navigate(MyScreens.CategoryScreen.route + "/" + it)
-                }, modifier = Modifier,
-                OnAddNewComment = { name, body, rating ->
-                    viewModel.addNewComment(productId, name , body  , rating, onSuccess = {
-                        Toast.makeText(context, "Comment Added Successfully", Toast.LENGTH_SHORT).show()
-                    }, onError = {error ->
-                        Toast.makeText(context,"Failed to add : $error", Toast.LENGTH_SHORT).show()
-                    })
-                }
-            )
-
-
-
+            }
         }
 
         AddToCart()
     }
 
-}
 
+
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CommentBody(comment: Comment) {
+    val formatter = DateTimeFormatter.ISO_DATE_TIME
+    val dateTimeString = comment.datetime_created ?:"Invalid Date"
+    val dateTime = LocalDateTime.parse(dateTimeString, formatter)
+    val formattedDateTime = getTimeAgo(dateTime)
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 16.dp, end = 16.dp, top = 8.dp),
-        elevation = 3.dp,
+        elevation = 1.dp,
         border = BorderStroke(0.dp, color = Color.LightGray),
         shape = Shapes.large
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
+            Row(modifier = Modifier
+                .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+
+            ){
+                Text(
+                    text = comment.name,
+                    style = TextStyle(fontSize = 12.sp),
+                    fontWeight = FontWeight.Bold
+                )
+                CommentRatingBar(currentRating =comment.rating)
+            }
             Text(
-                text = comment.name,
-                style = TextStyle(fontSize = 15.sp),
-                fontWeight = FontWeight.Bold
+                text = formattedDateTime,
+                style = TextStyle(fontSize = 8.sp),
+                color= Color.LightGray,
+                fontWeight = FontWeight.Light
             )
             Text(
                 text = comment.body,
@@ -180,6 +229,7 @@ fun CommentBody(comment: Comment) {
 
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ProductComment(comment: List<Comment>, AddNewComment: (name:String,body:String,rating:Int) -> Unit) {
     val ShowCommentDialog = remember { mutableStateOf(false) }
@@ -341,6 +391,7 @@ fun AddNewCommentDialog(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ProductItem(
     comments: List<Comment>,
@@ -576,9 +627,7 @@ fun MainTextComment(
         value = edtValue,
         singleLine = singleLine,
         maxLines = 2,
-//        onValueChange = onValueChange,
         onValueChange = {
-            // Check and limit the length if needed
             if (it.length <= maxLength) {
                 onValueChange(it)
             }

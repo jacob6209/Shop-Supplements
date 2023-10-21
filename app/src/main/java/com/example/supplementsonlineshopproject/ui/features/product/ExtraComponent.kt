@@ -1,3 +1,36 @@
+
+import android.os.Build
+import android.provider.ContactsContract
+import android.util.Log
+import androidx.annotation.RequiresApi
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun getTimeAgo(dateTime: LocalDateTime): String {
+    val now = LocalDateTime.now()
+    Log.d("TAG", "DateTimeStringNow: $now")
+    Log.d("TAG", "DateTimeStringDatatime: $dateTime")
+    val differenceMinutes = ChronoUnit.MINUTES.between(dateTime, now)
+    Log.d("TAG", "DateTimeStringDIFF: $differenceMinutes")
+
+    return when {
+        differenceMinutes < 1 -> "Just now"
+        differenceMinutes < 60 -> "$differenceMinutes minutes ago"
+        else -> {
+            val differenceHours = differenceMinutes / 60
+            when {
+                differenceHours < 24 -> "$differenceHours hours ago"
+                differenceHours < 24 * 7 -> "${differenceHours / 24} days ago"
+                differenceHours < 24 * 30 -> "${differenceHours / (24 * 7)} weeks ago"
+                else -> "${differenceHours / (24 * 30)} months ago"
+            }
+        }
+    }
+}
+
+
+
 //package com.example.supplementsonlineshopproject.ui.features.product
 //
 //import androidx.compose.foundation.clickable

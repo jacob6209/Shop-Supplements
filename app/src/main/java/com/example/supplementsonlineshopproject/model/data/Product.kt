@@ -7,6 +7,11 @@ import androidx.room.TypeConverters
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import android.os.Parcelable
+import android.provider.ContactsContract.Contacts.Data
+import java.text.DateFormat
+import java.time.LocalDate
+import java.util.Date
+
 //import kotlinx.android.parcel.Parcelize
 
 
@@ -51,7 +56,8 @@ data class Comment(
     val body: String,
     val id: Int,
     val name: String,
-    val rating: Int
+    val rating: Int,
+    val datetime_created:String
 )
 //--------------------------------------------------------------------------------------------------
 class CommentListConverter {

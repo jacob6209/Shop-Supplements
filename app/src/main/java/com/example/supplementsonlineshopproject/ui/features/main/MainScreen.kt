@@ -60,6 +60,8 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dev.burnoo.cokoin.navigation.getNavController
 import dev.burnoo.cokoin.navigation.getNavViewModel
 import org.koin.core.parameter.parametersOf
+import java.text.NumberFormat
+import java.util.Locale
 
 @Preview(showBackground = true)
 @Composable
@@ -192,9 +194,6 @@ fun ProductItem(product: ProductResponse,onProductClicked:(String)->Unit) {
 
 
             AsyncImage(
-//                model = ImageRequest.Builder(LocalContext.current)
-//                    .data(images)
-
                 model = BASE_URL+product.images.firstOrNull()?.image,
                 modifier = Modifier.size(200.dp),
                 contentScale = ContentScale.Crop,
@@ -205,13 +204,14 @@ fun ProductItem(product: ProductResponse,onProductClicked:(String)->Unit) {
 
             Column(modifier = Modifier.padding(10.dp)) {
                 Text(
-                    text = product.title,
+                    text = product.title.take(25),
                     style = TextStyle(fontSize = 12.sp),
                     fontWeight = FontWeight.Medium
                 )
+                val formattedPrice = NumberFormat.getNumberInstance(Locale.getDefault()).format(product.unit_price)
                 Text(
                     modifier = Modifier.padding(top = 4.dp),
-                    text = "${product.unit_price} Tomans",
+                    text = "$formattedPrice Tomans",
                     style = TextStyle(fontSize = 11.sp),
                 )
                 Text(
