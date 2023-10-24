@@ -1,8 +1,9 @@
 package com.example.supplementsonlineshopproject.model.net
 
-import android.util.Log
 import com.example.supplementsonlineshopproject.model.data.AddNewCommentResponse
+import com.example.supplementsonlineshopproject.model.data.AddProductToCartResponse
 import com.example.supplementsonlineshopproject.model.data.AdsResponse
+import com.example.supplementsonlineshopproject.model.data.CreateCartResponse
 import com.example.supplementsonlineshopproject.model.data.LoginResponse
 import com.example.supplementsonlineshopproject.model.data.PassResetResponse
 import com.example.supplementsonlineshopproject.model.data.ProductResponse
@@ -42,6 +43,10 @@ interface ApiService {
     suspend fun getSpecificProductWithComments(@Path("productId") productId: Int):ProductResponse
     @POST("store/products/{productId}/comments/")
     suspend fun addNewcomment(@Path("productId") id: Int,@Body jsonObject: JsonObject):AddNewCommentResponse
+    @POST("store/cart/")
+    suspend fun CreateUserCart():Response<CreateCartResponse>
+    @POST("store/cart/{cartId}/items/")
+    suspend fun AddProductToCart(@Path("cartId") id:String,@Body jsonObject: JsonObject):Response<AddProductToCartResponse>
 
 }
 

@@ -95,7 +95,6 @@ class UserRepositoryImpl(
 
     override fun loadToken() {
         TokenInMemory.saveTokens(getEmail(),getToken(),getRefreshToken())
-        Log.d("TokenLoading", "Token loaded: ${TokenInMemory}()")
     }
 
     override fun saveToken(newToken: String) {
