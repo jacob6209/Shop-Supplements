@@ -7,6 +7,7 @@ import com.example.supplementsonlineshopproject.model.data.ProductResponse
 import com.example.supplementsonlineshopproject.model.net.ApiService
 import com.example.supplementsonlineshopproject.util.CommentException
 import com.example.supplementsonlineshopproject.util.EMPTY_PRODUCT
+import com.example.supplementsonlineshopproject.util.coroutinExceptionHandler
 import com.google.gson.JsonObject
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -22,12 +23,18 @@ class CartRepositoryImpl(
     private val apiService: ApiService,
     private val sharepref:SharedPreferences
 ) : CartRepository {
-    override suspend fun addToCart(cartId: String,productId: Int): Boolean {
+    override suspend fun addToCart(cartId: String,productId: Int): Response<AddProductToCartResponse> {
+
         val jsonObject=JsonObject().apply {
             addProperty("product",productId)
         }
-        val result=apiService.AddProductToCart(id = cartId,jsonObject)
-        return result.isSuccessful
+        return try {
+            val response = apiService.AddProductToCart(cartId, jsonObject)
+            response
+        } catch (e: Exception) {
+            // Handle the exception and return an error response
+            Response.error(500, ResponseBody.create(null, "An error occurred"))
+        }
 
     }
 

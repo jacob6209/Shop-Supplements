@@ -204,10 +204,7 @@ fun ProductScreen(productId: Int) {
                 if (cartIdInCachMemo == null) {
                     try{
                     viewModel.getProductCartId() {
-                        Log.d("Tag=======>", it)
-                        Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
                         viewModel.saveCartId(it)
-                        Log.d("getCartIdFromCach=>", viewModel.getCartIdFromCach()!!)
                     }
                     }catch (e:Exception){
                         throw ProductViewModel.CustomException("Error In Get Id Cart ${e.message}")

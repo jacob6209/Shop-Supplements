@@ -79,10 +79,10 @@ class ProductViewModel(
             delay(2000)
             isAddingProduct.value = false
 
-            if (result) {
+            if (result.isSuccessful) {
                 AddingToCart("Product Added To Cart")
-            } else {
-                AddingToCart("Product Not Added")
+            } else if (result.code()==400) {
+                AddingToCart("Not enough stock available for this product.")
             }
         }
     }

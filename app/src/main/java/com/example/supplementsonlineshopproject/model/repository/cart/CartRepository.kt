@@ -1,12 +1,13 @@
 package com.example.supplementsonlineshopproject.model.repository.cart
 
+import com.example.supplementsonlineshopproject.model.data.AddProductToCartResponse
 import com.example.supplementsonlineshopproject.model.data.CreateCartResponse
 import retrofit2.Response
 
 
 interface CartRepository {
 
-suspend fun addToCart(cartId: String,productId:Int): Boolean
+suspend fun addToCart(cartId: String,productId:Int): Response<AddProductToCartResponse>
 suspend fun createCart(): String?
 
 //offline
