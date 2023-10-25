@@ -15,6 +15,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Badge
+import androidx.compose.material.BadgedBox
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -56,6 +58,7 @@ import com.example.supplementsonlineshopproject.util.CATEGORY
 import com.example.supplementsonlineshopproject.util.MyScreens
 import com.example.supplementsonlineshopproject.util.NetworkChecker
 import com.example.supplementsonlineshopproject.util.TAGS
+import com.example.supplementsonlineshopproject.util.stylePrice
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dev.burnoo.cokoin.navigation.getNavController
 import dev.burnoo.cokoin.navigation.getNavViewModel
@@ -82,16 +85,27 @@ fun MainScreenPreview() {
 fun MainScreen() {
     val context = LocalContext.current
     val uiController = rememberSystemUiController()
-    val navigation= getNavController()
+    val navigation = getNavController()
     val viewModel = getNavViewModel<MainViewModel>(
         parameters = { parametersOf(NetworkChecker(context).isInternetConnected) }
     )
+
+    if (NetworkChecker(context).isInternetConnected) {
+        viewModel.loadBadgeNumber()
+    }
     Scaffold(
-        topBar = { TopToolbar(onCartClicked = {
-            navigation.navigate(MyScreens.CartScreen.route)
-        }, onProfilClicked ={
-            navigation.navigate(MyScreens.ProfileScreen.route)
-        } ) }
+        topBar = {
+            TopToolbar(badgeNumber = viewModel.badgeNumber.value,
+                onCartClicked = {
+                    if (NetworkChecker(context).isInternetConnected){
+                    navigation.navigate(MyScreens.CartScreen.route)
+                    }else{
+                        Toast.makeText(context, "Check Your Internet Connection ", Toast.LENGTH_SHORT).show()
+                    }
+                }, onProfilClicked = {
+                    navigation.navigate(MyScreens.ProfileScreen.route)
+                })
+        }
 
     ) { innerPadding ->    /* avoid overlapping with the system insets (like the status bar and navigation bar)    */
         SideEffect {
@@ -110,14 +124,14 @@ fun MainScreen() {
                     color = Blue
                 )
             }
-            Categorybar(CATEGORY){
-                navigation.navigate(MyScreens.CategoryScreen.route+"/"+it)
+            Categorybar(CATEGORY) {
+                navigation.navigate(MyScreens.CategoryScreen.route + "/" + it)
             }
             val productDataState = viewModel.dataProducts
             val adsDataState = viewModel.dataAds
 
-            ProductSubjectList(TAGS, productDataState.value, adsDataState.value){
-                navigation.navigate(MyScreens.ProductScreen.route+"/"+it)
+            ProductSubjectList(TAGS, productDataState.value, adsDataState.value) {
+                navigation.navigate(MyScreens.ProductScreen.route + "/" + it)
             }
 //            ProductSubject()
 //            BigPictureTablighat()
@@ -133,17 +147,17 @@ fun ProductSubjectList(
     tags: List<String>,
     products: List<ProductResponse>,
     ads: List<AdsResponse>,
-    onProductClicked:(String)->Unit,
+    onProductClicked: (String) -> Unit,
 ) {
-    val context= LocalContext.current
+    val context = LocalContext.current
     if (products.isNotEmpty()) {
         Column {
             tags.forEachIndexed { it, _ ->
                 val withTagData = products.filter { product -> product.tags == tags[it] }
-                ProductSubject(tags[it], withTagData.shuffled(),onProductClicked)
+                ProductSubject(tags[it], withTagData.shuffled(), onProductClicked)
                 if (ads.size >= 2)
                     if (it == 1 || it == 2)
-                        BigPictureTablighat(ads[it - 1],onProductClicked)
+                        BigPictureTablighat(ads[it - 1], onProductClicked)
 
             }
         }
@@ -154,7 +168,11 @@ fun ProductSubjectList(
 
 //<----------------------------------------------------------------------------------->
 @Composable
-fun ProductSubject(subject: String, data: List<ProductResponse>,onProductClicked:(String)->Unit) {
+fun ProductSubject(
+    subject: String,
+    data: List<ProductResponse>,
+    onProductClicked: (String) -> Unit
+) {
     Column(modifier = Modifier.padding(top = 32.dp))
     {
         Text(
@@ -163,12 +181,12 @@ fun ProductSubject(subject: String, data: List<ProductResponse>,onProductClicked
             style = MaterialTheme.typography.h6
         )
 
-        ProductBar(data,onProductClicked)
+        ProductBar(data, onProductClicked)
     }
 }
 
 @Composable
-fun ProductBar(data: List<ProductResponse>,onProductClicked:(String)->Unit) {
+fun ProductBar(data: List<ProductResponse>, onProductClicked: (String) -> Unit) {
     LazyRow(
         modifier = Modifier.padding(top = 16.dp),
         contentPadding = PaddingValues(end = 16.dp)
@@ -176,17 +194,17 @@ fun ProductBar(data: List<ProductResponse>,onProductClicked:(String)->Unit) {
     {
         items(data.size) {
 
-            ProductItem(data[it],onProductClicked)
+            ProductItem(data[it], onProductClicked)
         }
     }
 }
 
 @Composable
-fun ProductItem(product: ProductResponse,onProductClicked:(String)->Unit) {
+fun ProductItem(product: ProductResponse, onProductClicked: (String) -> Unit) {
     Card(
         modifier = Modifier
             .padding(start = 16.dp)
-            .clickable {onProductClicked.invoke((product.id).toString())},
+            .clickable { onProductClicked.invoke((product.id).toString()) },
         elevation = 4.dp,
         shape = Shapes.medium
     ) {
@@ -194,13 +212,13 @@ fun ProductItem(product: ProductResponse,onProductClicked:(String)->Unit) {
 
 
             AsyncImage(
-                model = BASE_URL+product.images.firstOrNull()?.image,
+                model = BASE_URL + product.images.firstOrNull()?.image,
                 modifier = Modifier.size(200.dp),
                 contentScale = ContentScale.Crop,
                 contentDescription = null,
 
 
-            )
+                )
 
             Column(modifier = Modifier.padding(10.dp)) {
                 Text(
@@ -208,10 +226,11 @@ fun ProductItem(product: ProductResponse,onProductClicked:(String)->Unit) {
                     style = TextStyle(fontSize = 12.sp),
                     fontWeight = FontWeight.Medium
                 )
-                val formattedPrice = NumberFormat.getNumberInstance(Locale.getDefault()).format(product.unit_price)
+//                val formattedPrice =
+//                    NumberFormat.getNumberInstance(Locale.getDefault()).format(product.unit_price)
                 Text(
                     modifier = Modifier.padding(top = 4.dp),
-                    text = "$formattedPrice Tomans",
+                    text = stylePrice(product.unit_price.toInt().toString()),
                     style = TextStyle(fontSize = 11.sp),
                 )
                 Text(
@@ -229,16 +248,16 @@ fun ProductItem(product: ProductResponse,onProductClicked:(String)->Unit) {
 
 //<----------------------------------------------------------------------------------->
 @Composable
-fun BigPictureTablighat(ads:AdsResponse,onProductClicked:(String)->Unit) {
+fun BigPictureTablighat(ads: AdsResponse, onProductClicked: (String) -> Unit) {
 
     AsyncImage(
-        model= ads.product.images.lastOrNull()?.image,
+        model = ads.product.images.lastOrNull()?.image,
         modifier = Modifier
             .fillMaxWidth()
             .height(260.dp)
             .padding(top = 32.dp, start = 16.dp, end = 16.dp)
             .clip(shape = Shapes.medium)
-            .clickable { onProductClicked.invoke((ads.product.id).toString())},
+            .clickable { onProductClicked.invoke((ads.product.id).toString()) },
         contentDescription = null,
         contentScale = ContentScale.FillWidth
     )
@@ -246,17 +265,29 @@ fun BigPictureTablighat(ads:AdsResponse,onProductClicked:(String)->Unit) {
 
 //<----------------------------------------------------------------------------------->
 @Composable
-fun TopToolbar(onCartClicked:()->Unit,onProfilClicked:()->Unit) {
+fun TopToolbar(
+    badgeNumber: Int,
+    onCartClicked: () -> Unit,
+    onProfilClicked: () -> Unit
+) {
 
     TopAppBar(
         backgroundColor = Color.White,
         elevation = 0.dp,
         title = { Text(text = "Jac Supplement") },
         actions = {
-            IconButton(onClick = {onCartClicked.invoke() }) {
-                Icon(Icons.Default.ShoppingCart, null)
+            IconButton(
+                onClick = { onCartClicked.invoke() },
+            ) {
+                if (badgeNumber == 0) {
+                    Icon(Icons.Default.ShoppingCart, contentDescription = null)
+                } else {
+                    BadgedBox(badge = { Badge { Text(text = badgeNumber.toString()) } }) {
+                        Icon(Icons.Default.ShoppingCart, contentDescription = null)
+                    }
+                }
             }
-            IconButton(onClick = {onProfilClicked.invoke() }) {
+            IconButton(onClick = { onProfilClicked.invoke() }) {
                 Icon(Icons.Default.Person, null)
             }
         }
@@ -265,23 +296,23 @@ fun TopToolbar(onCartClicked:()->Unit,onProfilClicked:()->Unit) {
 
 //<----------------------------------------------------------------------------------->
 @Composable
-fun Categorybar(CategoryList: List<Pair<String, Int>>,onCategoryClicked:(String)->Unit) {
+fun Categorybar(CategoryList: List<Pair<String, Int>>, onCategoryClicked: (String) -> Unit) {
     LazyRow(
         modifier = Modifier.padding(top = 16.dp),
         contentPadding = PaddingValues(end = 16.dp)
     ) {
         items(CategoryList.size) {
-            CategoryItem(CategoryList[it],onCategoryClicked)
+            CategoryItem(CategoryList[it], onCategoryClicked)
         }
     }
 }
 
 @Composable
-fun CategoryItem(subject: Pair<String, Int>,onCategoryClicked:(String)->Unit) {
+fun CategoryItem(subject: Pair<String, Int>, onCategoryClicked: (String) -> Unit) {
     Column(
         modifier = Modifier
             .padding(start = 16.dp)
-            .clickable {onCategoryClicked(subject.first)},
+            .clickable { onCategoryClicked(subject.first) },
         horizontalAlignment = Alignment.CenterHorizontally,
     )
     {

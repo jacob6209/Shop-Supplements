@@ -9,6 +9,7 @@ import com.example.supplementsonlineshopproject.model.data.PassResetResponse
 import com.example.supplementsonlineshopproject.model.data.ProductResponse
 import com.example.supplementsonlineshopproject.model.data.RefreshToken
 import com.example.supplementsonlineshopproject.model.data.SignUpResponse
+import com.example.supplementsonlineshopproject.model.data.UserCartInfo
 import com.example.supplementsonlineshopproject.model.repository.TokenInMemory
 import com.example.supplementsonlineshopproject.util.BASE_URL
 import com.google.gson.JsonObject
@@ -47,6 +48,9 @@ interface ApiService {
     suspend fun CreateUserCart():Response<CreateCartResponse>
     @POST("store/cart/{cartId}/items/")
     suspend fun AddProductToCart(@Path("cartId") id:String,@Body jsonObject: JsonObject):Response<AddProductToCartResponse>
+
+    @GET("store/cart/{cartId}/items/")
+    suspend fun getUserCart(@Path("cartId") id:String):Response<List<UserCartInfo>>
 
 }
 

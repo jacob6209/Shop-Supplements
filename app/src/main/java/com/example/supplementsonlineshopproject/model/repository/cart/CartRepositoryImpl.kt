@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import com.example.supplementsonlineshopproject.model.data.AddProductToCartResponse
 import com.example.supplementsonlineshopproject.model.data.CreateCartResponse
 import com.example.supplementsonlineshopproject.model.data.ProductResponse
+import com.example.supplementsonlineshopproject.model.data.UserCartInfo
 import com.example.supplementsonlineshopproject.model.net.ApiService
 import com.example.supplementsonlineshopproject.util.CommentException
 import com.example.supplementsonlineshopproject.util.EMPTY_PRODUCT
@@ -66,6 +67,22 @@ class CartRepositoryImpl(
 
     override fun getCartId(): String? {
         return sharepref.getString("cartId",null)
+    }
+
+    override suspend fun getCartUserInfo(cartId: String): Response<List<UserCartInfo>> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getCartSize(cartId: String): Int {
+        val response=apiService.getUserCart(cartId)
+        var counter=0
+        if (response.isSuccessful){
+            response.body()!!.forEach(){
+            counter+=it.quantity?:0
+            }
+            return counter
+        }
+        return 0
     }
 
 

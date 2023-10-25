@@ -2,6 +2,7 @@ package com.example.supplementsonlineshopproject.model.repository.cart
 
 import com.example.supplementsonlineshopproject.model.data.AddProductToCartResponse
 import com.example.supplementsonlineshopproject.model.data.CreateCartResponse
+import com.example.supplementsonlineshopproject.model.data.UserCartInfo
 import retrofit2.Response
 
 
@@ -16,5 +17,7 @@ fun loadCartId()
 fun saveCartId(cartId:String?)
 fun getCartId():String?
 
+suspend fun getCartUserInfo(cartId: String):Response<List<UserCartInfo>>
+suspend fun getCartSize(cartId: String):Int
 
 }

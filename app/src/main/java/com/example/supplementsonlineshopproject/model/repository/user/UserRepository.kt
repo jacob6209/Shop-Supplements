@@ -21,4 +21,12 @@ interface UserRepository {
     fun saveEmail(email: String)
     fun getEmail():String?
 
+
+    fun saveUserLocation(address:String,postalCode:String)
+
+    fun getUserLocation():Pair<String,String>
+
+    fun saveUserLoginTime()
+    fun getUserLoginTime():String
+
 }

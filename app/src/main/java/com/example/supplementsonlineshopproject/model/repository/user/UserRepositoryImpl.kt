@@ -51,6 +51,9 @@ class UserRepositoryImpl(
                 TokenInMemory.saveTokens(email,result.refresh, result.access)
                 saveToken(result.access)
                 saveRefreshToken(result.refresh)
+                saveUserLoginTime()
+                saveEmail(email)
+
                 return VALUE_SUCCESS
             } else {
                 return result.detail
@@ -121,6 +124,26 @@ class UserRepositoryImpl(
 
     override fun getEmail(): String? {
         return sharedPref.getString("email",null)
+    }
+
+    override fun saveUserLocation(address: String, postalCode: String) {
+        sharedPref.edit().putString("address",address).apply()
+        sharedPref.edit().putString("postalCode",postalCode).apply()
+    }
+
+    override fun getUserLocation(): Pair<String, String> {
+        val address=sharedPref.getString("address","Click to add")!!
+        val postalCode=sharedPref.getString("postalCode","Click to add")!!
+        return  Pair(address,postalCode)
+    }
+
+    override fun saveUserLoginTime() {
+        val now=System.currentTimeMillis()
+        sharedPref.edit().putString("login_time",now.toString()).apply()
+    }
+
+    override fun getUserLoginTime(): String {
+        return sharedPref.getString("login_time","0")!!
     }
 
 }

@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.supplementsonlineshopproject.model.data.CreateCartResponse
 import com.example.supplementsonlineshopproject.model.data.ProductResponse
+import com.example.supplementsonlineshopproject.model.repository.cart.CartInMemory.cartId
 import com.example.supplementsonlineshopproject.model.repository.cart.CartRepository
 import com.example.supplementsonlineshopproject.model.repository.comment.CommentRepository
 import com.example.supplementsonlineshopproject.model.repository.product.ProductRepository
@@ -30,15 +31,23 @@ class ProductViewModel(
         loadProductFromCash(productId)
         if (isInternetConnected) {
             loadAllComments(productId)
+            loadBadgeNumber()
         }
     }
 
     val thisProduct = mutableStateOf(EMPTY_PRODUCT)
     val ProductResponseComments = mutableStateOf(EMPTY_PRODUCT)
     val isAddingProduct = mutableStateOf(false)
+    val badgeNumber= mutableStateOf(0)
     private fun loadProductFromCash(productId: Int) {
         viewModelScope.launch(coroutinExceptionHandler) {
             thisProduct.value = productRepository.getProductById(productId)
+        }
+    }
+
+    private fun loadBadgeNumber(){
+        viewModelScope.launch(coroutinExceptionHandler) {
+            badgeNumber.value=cartRepository.getCartSize(cartId!!)
         }
     }
 
@@ -82,7 +91,7 @@ class ProductViewModel(
             if (result.isSuccessful) {
                 AddingToCart("Product Added To Cart")
             } else if (result.code()==400) {
-                AddingToCart("Not enough stock available for this product.")
+                AddingToCart("Sorry, not enough stock available for this product!!")
             }
         }
     }

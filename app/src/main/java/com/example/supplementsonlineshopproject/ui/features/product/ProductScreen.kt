@@ -86,6 +86,7 @@ import com.example.supplementsonlineshopproject.util.BASE_URL
 import com.example.supplementsonlineshopproject.util.MyScreens
 import com.example.supplementsonlineshopproject.util.NetworkChecker
 import com.example.supplementsonlineshopproject.util.lerp
+import com.example.supplementsonlineshopproject.util.stylePrice
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.HorizontalPagerIndicator
@@ -143,7 +144,7 @@ fun ProductScreen(productId: Int) {
             ) {
                 ProductToolbar(
                     productName = "Datail",
-                    badgeNumber = 0,
+                    badgeNumber = viewModel.badgeNumber.value,
                     OnBackClicked = { navigation.popBackStack() },
                     OnCartClicked = {
                         if (NetworkChecker(context).isInternetConnected) {
@@ -157,7 +158,8 @@ fun ProductScreen(productId: Int) {
                         }
                     }
                 )
-                val allComments: List<Comment> = viewModel.ProductResponseComments.value.comments
+               val allComments= if (NetworkChecker(context).isInternetConnected)  viewModel.ProductResponseComments.value.comments else listOf()
+//                val allComments: List<Comment> = viewModel.ProductResponseComments.value.comments
                 val sortedComments = allComments.sortedByDescending { it.id }
                 ProductItem(
                     comments = sortedComments,
@@ -168,7 +170,7 @@ fun ProductScreen(productId: Int) {
                     OnAddNewComment = { name, body, rating ->
                         viewModel.addNewComment(productId, name, body, rating, onSuccess = {
                             showAnimation = true
-//                         Toast.makeText(context, "Comment Added Successfully", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Comment Added Successfully", Toast.LENGTH_SHORT).show()
                         }, onError = { error ->
                             Toast.makeText(context, "Failed to add : $error", Toast.LENGTH_SHORT)
                                 .show()
@@ -496,6 +498,7 @@ fun ProductItem(
 
 @Composable
 fun ProdactDetail(data: ProductResponse, CommentNumber: String) {
+    val context= LocalContext.current
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -505,12 +508,12 @@ fun ProdactDetail(data: ProductResponse, CommentNumber: String) {
             Image(
                 painter = painterResource(id = R.drawable.rating1),
                 contentDescription = null,
-                modifier = Modifier.size(70.dp)
+                modifier = Modifier.size(26.dp)
             )
             Text(
                 text = "${data.average_rating} Rate",
-                modifier = Modifier.padding(start = 6.dp),
-                fontSize = 13.sp
+                modifier = Modifier.padding(start = 5.dp),
+                fontSize = 12.sp
             )
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -519,10 +522,11 @@ fun ProdactDetail(data: ProductResponse, CommentNumber: String) {
                 contentDescription = null,
                 modifier = Modifier.size(26.dp)
             )
+            val commentText=if(NetworkChecker(context).isInternetConnected) "$CommentNumber Comments" else "No Internet Connection!"
             Text(
-                text = "$CommentNumber Comments",
-                modifier = Modifier.padding(start = 6.dp),
-                fontSize = 13.sp
+                text = commentText,
+                modifier = Modifier.padding(start = 5.dp),
+                fontSize = 12.sp
             )
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -533,8 +537,8 @@ fun ProdactDetail(data: ProductResponse, CommentNumber: String) {
             )
             Text(
                 text = "${data.inventory} Stock",
-                modifier = Modifier.padding(start = 6.dp),
-                fontSize = 13.sp
+                modifier = Modifier.padding(start = 5.dp),
+                fontSize = 12.sp
             )
         }
 
@@ -618,8 +622,6 @@ fun AddToCart(
 ) {
     val configuration= LocalConfiguration.current
     val fraction =if (configuration.orientation==Configuration.ORIENTATION_LANDSCAPE) 0.15f else 0.08f
-    // Define a state to hold the cart ID
-    val cartIdState = rememberUpdatedState<String?>(null)
 
     Surface(
         color = Color.White,
@@ -655,7 +657,7 @@ fun AddToCart(
 
             }
 
-            val formattedPrice = NumberFormat.getNumberInstance(Locale.getDefault()).format(price.toInt())
+//            val formattedPrice = NumberFormat.getNumberInstance(Locale.getDefault()).format(price.toInt())
             Surface(
                 modifier = Modifier
                     .padding(end = 16.dp)
@@ -668,7 +670,7 @@ fun AddToCart(
                         horizontal = 8.dp,
                         vertical = 6.dp
                     ),
-                    text = "$formattedPrice Tomans",
+                    text = stylePrice(price.toInt().toString()),
                     style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium)
                 )
             }
@@ -775,8 +777,8 @@ fun MainTextComment(
 
 //                  For Animation DotsPulsing
 //----------------------------------------------------------------------------------------------
-const val numberOfDots = 7
-val dotSize = 15.dp
+const val numberOfDots =5
+val dotSize = 24.dp
 val dotColor: Color = Color.White
 const val delayUnit = 200
 const val duration = numberOfDots * delayUnit
