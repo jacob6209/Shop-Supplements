@@ -39,7 +39,7 @@ class MainViewModel(
             val newDataProduct =async{productRepository.getAllProducts(isInternetConnected)}
             val newDataAds =async{productRepository.getAllAds(isInternetConnected)}
             updateData(newDataProduct.await(),newDataAds.await())
-
+            loadBadgeNumber()
             showProgressBar.value=false
         }
 
@@ -52,7 +52,8 @@ class MainViewModel(
 
      fun loadBadgeNumber(){
         viewModelScope.launch(coroutinExceptionHandler) {
-            badgeNumber.value=cartRepository.getCartSize(CartInMemory.cartId!!)
+            badgeNumber.value=cartRepository.getCartSize(cartRepository.getCartId()!!)
+//            badgeNumber.value=cartRepository.getCartSize(CartInMemory.cartId!!)
         }
     }
 

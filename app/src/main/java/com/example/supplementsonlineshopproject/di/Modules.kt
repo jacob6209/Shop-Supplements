@@ -15,6 +15,7 @@ import com.example.supplementsonlineshopproject.model.repository.product.Product
 import com.example.supplementsonlineshopproject.model.repository.product.ProductRepositoryImpl
 import com.example.supplementsonlineshopproject.model.repository.user.UserRepository
 import com.example.supplementsonlineshopproject.model.repository.user.UserRepositoryImpl
+import com.example.supplementsonlineshopproject.ui.features.cart.CartViewModel
 import com.example.supplementsonlineshopproject.ui.features.category.CategoryViewModel
 import com.example.supplementsonlineshopproject.ui.features.main.MainViewModel
 import com.example.supplementsonlineshopproject.ui.features.product.ProductViewModel
@@ -43,4 +44,5 @@ val myModules= module {
     viewModel{(isNetConnected:Boolean)->MainViewModel(get(),get(),isNetConnected)}
     viewModel{ProductViewModel(get(),get(),get())}
     viewModel{ ProfileViewModel(get())}
+    viewModel{ CartViewModel(get(),get())}
 }

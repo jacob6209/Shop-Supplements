@@ -1,6 +1,7 @@
 package com.example.supplementsonlineshopproject.model.data
 
 data class UserCartInfo(
+
     val id: Int,
     val item_total: Double,
     val product: Product,

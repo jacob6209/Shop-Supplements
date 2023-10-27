@@ -18,6 +18,7 @@ import com.example.supplementsonlineshopproject.di.myModules
 import com.example.supplementsonlineshopproject.model.repository.TokenInMemory
 import com.example.supplementsonlineshopproject.model.repository.user.UserRepository
 import com.example.supplementsonlineshopproject.ui.features.IntroScreen
+import com.example.supplementsonlineshopproject.ui.features.cart.CartScreen
 import com.example.supplementsonlineshopproject.ui.features.category.CategoryScreen
 //import com.example.supplementsonlineshopproject.ui.features.category.CategoryScreen
 import com.example.supplementsonlineshopproject.ui.features.main.MainScreen
@@ -124,11 +125,6 @@ fun SupplementsUi(){
 }
 
 
-
-@Composable
-fun CartScreen() {
-
-}
 
 
 

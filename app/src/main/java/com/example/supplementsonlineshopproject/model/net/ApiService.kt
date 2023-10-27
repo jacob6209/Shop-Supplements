@@ -19,8 +19,10 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface ApiService {
@@ -51,6 +53,15 @@ interface ApiService {
 
     @GET("store/cart/{cartId}/items/")
     suspend fun getUserCart(@Path("cartId") id:String):Response<List<UserCartInfo>>
+
+    @PUT("store/cart/{cartId}/items/{productId}/")
+    suspend fun removeFromCart(@Path("cartId") id:String,@Path("productId") productId:String):Response<UserCartInfo>
+//    suspend fun removeFromCart(@Path("cartId") id:String,@Path("productId") productId:String,@Body jsonObject: JsonObject):Response<UserCartInfo>
+
+
+
+
+
 
 }
 

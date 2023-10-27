@@ -84,7 +84,7 @@ class ProductViewModel(
     fun addProductToCart(cartId: String?,productId: Int, AddingToCart: (String) -> Unit) {
         viewModelScope.launch(coroutinExceptionHandler) {
             isAddingProduct.value = true
-            val result = cartRepository.addToCart(cartId!!,productId)
+            val result = cartRepository.addToCart(cartId!!,productId.toString())
             delay(2000)
             isAddingProduct.value = false
 

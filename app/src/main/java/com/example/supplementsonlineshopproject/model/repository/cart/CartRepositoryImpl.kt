@@ -18,13 +18,13 @@ import retrofit2.http.POST
 import retrofit2.http.Body
 import retrofit2.http.Query
 import retrofit2.http.Path
-import java.lang.Exception
+import kotlin.Exception
 
 class CartRepositoryImpl(
     private val apiService: ApiService,
     private val sharepref:SharedPreferences
 ) : CartRepository {
-    override suspend fun addToCart(cartId: String,productId: Int): Response<AddProductToCartResponse> {
+    override suspend fun addToCart(cartId: String,productId: String): Response<AddProductToCartResponse> {
 
         val jsonObject=JsonObject().apply {
             addProperty("product",productId)
@@ -69,8 +69,27 @@ class CartRepositoryImpl(
         return sharepref.getString("cartId",null)
     }
 
-    override suspend fun getCartUserInfo(cartId: String): Response<List<UserCartInfo>> {
-        TODO("Not yet implemented")
+    override suspend fun getCartUserInfo(cartId: String?): Response<List<UserCartInfo>> {
+        return try {
+            val response=apiService.getUserCart(cartId!!)
+            response
+        } catch (e: Exception) {
+            // Handle the exception and return an error response
+            Response.error(500, ResponseBody.create(null, "An error occurred"))
+        }
+    }
+
+    override suspend fun removeFromCart(cartId: String,productId: String):Response<UserCartInfo> {
+//        val jsonObject=JsonObject().apply {
+//            addProperty("product",productId)
+//        }
+        return try {
+            val response = apiService.removeFromCart(cartId, productId)
+            response
+        } catch (e: Exception) {
+            // Handle the exception and return an error response
+            Response.error(500, ResponseBody.create(null, "An error occurred"))
+        }
     }
 
     override suspend fun getCartSize(cartId: String): Int {
