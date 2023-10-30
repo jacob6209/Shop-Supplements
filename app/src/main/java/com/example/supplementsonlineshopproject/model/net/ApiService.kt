@@ -4,8 +4,10 @@ import com.example.supplementsonlineshopproject.model.data.AddNewCommentResponse
 import com.example.supplementsonlineshopproject.model.data.AddProductToCartResponse
 import com.example.supplementsonlineshopproject.model.data.AdsResponse
 import com.example.supplementsonlineshopproject.model.data.CreateCartResponse
+import com.example.supplementsonlineshopproject.model.data.SubmitOrder
 import com.example.supplementsonlineshopproject.model.data.LoginResponse
 import com.example.supplementsonlineshopproject.model.data.PassResetResponse
+import com.example.supplementsonlineshopproject.model.data.PaymentCallBackResponse
 import com.example.supplementsonlineshopproject.model.data.ProductResponse
 import com.example.supplementsonlineshopproject.model.data.RefreshToken
 import com.example.supplementsonlineshopproject.model.data.SignUpResponse
@@ -19,20 +21,19 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
-import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface ApiService {
-    @POST("users/")
+    @POST("auth/users/")
     suspend fun signUp(@Body jsonObject: JsonObject):Response<SignUpResponse>
 
     @POST("auth/jwt/create/")
    suspend fun signIn(@Body jsonObject: JsonObject):LoginResponse
 
-    @POST("auth/password_reset/?")
+    @POST("auth/password_reset/")
     suspend fun PassReset(@Body jsonObject: JsonObject):PassResetResponse
 
     @POST("auth/jwt/refresh/")
@@ -56,10 +57,14 @@ interface ApiService {
 
     @PUT("store/cart/{cartId}/items/{productId}/")
     suspend fun removeFromCart(@Path("cartId") id:String,@Path("productId") productId:String):Response<UserCartInfo>
-//    suspend fun removeFromCart(@Path("cartId") id:String,@Path("productId") productId:String,@Body jsonObject: JsonObject):Response<UserCartInfo>
 
 
+    @POST("store/orders/")
+    suspend fun submitOrder(@Body jsonObject: JsonObject):SubmitOrder
 
+
+    @POST("payment/process/{Order_id}")
+    suspend fun PaymentProcess(@Path ("Order_id") id: String):Response<PaymentCallBackResponse>
 
 
 
@@ -72,13 +77,13 @@ fun CreateApiService():ApiService{
             val oldRequest = it.request()
             val newRequest = oldRequest.newBuilder()
             val pathSegments = oldRequest.url.encodedPathSegments
-           if (TokenInMemory.accessToken != null &&  pathSegments.isNotEmpty() && pathSegments.contains("comments")  ) {
+            if (TokenInMemory.accessToken != null &&  pathSegments.isNotEmpty() && pathSegments.contains("comments") || pathSegments.contains("orders") ) {
                 newRequest.addHeader("Authorization", "JWT " + TokenInMemory.accessToken!!)
             }else if(TokenInMemory.accessToken != null){
                 newRequest.addHeader("Authorization", "JWT" + TokenInMemory.accessToken!!)
             }
-                newRequest.addHeader("Accept", "application/json")
-                newRequest.method(oldRequest.method, oldRequest.body)
+            newRequest.addHeader("Accept", "application/json")
+            newRequest.method(oldRequest.method, oldRequest.body)
             return@addInterceptor it.proceed(newRequest.build())
         }
         .authenticator(AuthChecker())

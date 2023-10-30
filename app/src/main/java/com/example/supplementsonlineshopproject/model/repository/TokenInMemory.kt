@@ -9,6 +9,11 @@ object TokenInMemory {
         private set
 
     var accessToken: String? = null
+//        private set
+
+    fun saveOnlyAccessToken(accessToken: String?) {
+        this.accessToken = accessToken
+    }
 
     fun saveTokens(userEmail: String?,accessToken: String?, refreshToken: String?) {
         this.userEmail = userEmail

@@ -26,6 +26,7 @@ import androidx.compose.material.Checkbox
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -91,9 +92,16 @@ fun ProfileScreen() {
             }
             MainAnimation()
             Spacer(modifier = Modifier.padding(top = 6.dp))
+
+            ShowDataSection(subject = "First Name",text = viewModel.userFirst_Name.value.takeIf { it.isNotBlank() } ?: "Click To add") { viewModel.ShowLocationDialog.value = true }
+            ShowDataSection(subject = "Last Name",text = viewModel.userLast_Name.value.takeIf { it.isNotBlank() } ?: "Click To add") { viewModel.ShowLocationDialog.value = true }
+            ShowDataSection(subject = "Phone Number",text = viewModel.userPhone_Number.value.takeIf { it.isNotBlank() } ?: "Click To add") { viewModel.ShowLocationDialog.value = true }
+            ShowDataSection(subject = "Province",text = viewModel.userProvince.value.takeIf { it.isNotBlank() } ?: "Click To add") { viewModel.ShowLocationDialog.value = true }
+            ShowDataSection(subject = "City",text = viewModel.userCity.value.takeIf { it.isNotBlank() } ?: "Click To add") { viewModel.ShowLocationDialog.value = true }
+            ShowDataSection(subject = "Street",text = viewModel.userStreet.value.takeIf { it.isNotBlank() } ?: "Click To add") { viewModel.ShowLocationDialog.value = true }
+            ShowDataSection(subject = "Address",text = viewModel.address.value.takeIf { it.isNotBlank() } ?: "Click To add") { viewModel.ShowLocationDialog.value = true }
+            ShowDataSection(subject = "Postal Code",text = viewModel.postalcode.value.takeIf { it.isNotBlank() } ?: "Click To add") { viewModel.ShowLocationDialog.value = true }
             ShowDataSection(subject = "Email Address", text = viewModel.email.value, null)
-            ShowDataSection(subject = "Address",text = viewModel.address.value) { viewModel.ShowLocationDialog.value = true }
-            ShowDataSection(subject = "Postal Code",text = viewModel.postalcode.value) { viewModel.ShowLocationDialog.value = true }
             ShowDataSection(subject = "Login Time", text = styleTime(viewModel.loginTime.value.toLong()) , null)
             Button(onClick = {
                     Toast.makeText(context, "Hope to see you again :)", Toast.LENGTH_SHORT).show()
@@ -105,17 +113,30 @@ fun ProfileScreen() {
                         navigation.popBackStack()
                         navigation.popBackStack()
                     }
-                },modifier = Modifier.fillMaxWidth(0.8f).padding(top = 32.dp)){Text(text = "Sign Out")}
+                },modifier = Modifier
+                .fillMaxWidth(0.8f)
+                .padding(top = 32.dp)){Text(text = "Sign Out")}
 
         }
 
 //        part2
-        if (viewModel.ShowLocationDialog.value){
+        if (viewModel.ShowLocationDialog.value) {
             AddUserLocationDataDialog(
                 showSaveLocation = false,
-                onDismiss = { viewModel.ShowLocationDialog.value=false},
-                onSubmitClicked = {address,postalCode,_->
-                    viewModel.setUserLocation(address,postalCode)
+                onDismiss = { viewModel.ShowLocationDialog.value = false },
+                onSubmitClicked = { address, postalCode, userFirst_name, userlast_name, userPhone_Number, userProvince, userCity, userStreet, _ ->
+                        viewModel.setUserLocation(
+                            address,
+                            postalCode,
+                            userFirst_name,
+                            userlast_name,
+                            userPhone_Number,
+                            userProvince,
+                            userCity,
+                            userStreet
+                        )
+                        
+
                 }
             )
 
@@ -157,29 +178,41 @@ fun ShowDataSection(
 fun AddUserLocationDataDialog(
     showSaveLocation: Boolean,
     onDismiss: () -> Unit,
-    onSubmitClicked: (String, String, Boolean) -> Unit
+    onSubmitClicked: (String, String,String,String,String,String,String,String, Boolean) -> Unit
 ) {
 
+    val viewModel = getNavViewModel<ProfileViewModel>()
     val context = LocalContext.current
     val checkedState = remember { mutableStateOf(true) }
-    val userAddress = remember { mutableStateOf("") }
-    val userPostalCode = remember { mutableStateOf("") }
-    val fraction = if (showSaveLocation) 0.695f else 0.625f
+
+    val userFirst_name=remember{ mutableStateOf(viewModel.userFirst_Name.value)}
+    val userlast_name=remember{ mutableStateOf(viewModel.userLast_Name.value)}
+    val userPhone_Number=remember{ mutableStateOf(viewModel.userPhone_Number.value)}
+    val userProvince=remember{ mutableStateOf(viewModel.userProvince.value)}
+    val userCity=remember{ mutableStateOf(viewModel.userCity.value)}
+    val userStreet=remember{ mutableStateOf(viewModel.userStreet.value)}
+    val userAddress = remember { mutableStateOf(viewModel.address.value) }
+    val userPostalCode = remember { mutableStateOf(viewModel.postalcode.value) }
+
+
+//    val fraction = if (showSaveLocation) 0.695f else 0.625f
 
     Dialog(onDismissRequest = onDismiss) {
 
+
         Card(
-            modifier = Modifier.fillMaxHeight(fraction),
+            modifier = Modifier.fillMaxHeight(0.97f),
             elevation = 8.dp,
             shape = Shapes.medium
         ) {
-
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp),
+                    .padding(8.dp)
+                    .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceAround
+                verticalArrangement = Arrangement.SpaceAround,
+
             ) {
 
                 Text(
@@ -191,13 +224,30 @@ fun AddUserLocationDataDialog(
                         .fillMaxWidth()
                         .padding(8.dp)
                 )
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(2.dp))
 
-                MainTextField(userAddress.value,"your address...") {
+                MainTextField(userFirst_name.value,"First Name...",isError = userFirst_name.value.isBlank(),) {
+                    userFirst_name.value = it
+                }
+                MainTextField(userlast_name.value,"Last Name...",isError = userlast_name.value.isBlank(),) {
+                    userlast_name.value = it
+                }
+                MainTextField(userPhone_Number.value,"Phone Number...",isError = userPhone_Number.value.isBlank(),) {
+                    userPhone_Number.value = it
+                }
+                MainTextField(userProvince.value,"Province...",userProvince.value.isBlank()) {
+                    userProvince.value = it
+                }
+                MainTextField(userCity.value,"City...",userCity.value.isBlank()) {
+                    userCity.value = it
+                }
+                MainTextField(userStreet.value,"Street...",userStreet.value.isBlank()) {
+                    userStreet.value = it
+                }
+                MainTextField(userAddress.value,"Full Address...",userAddress.value.isBlank()) {
                     userAddress.value = it
                 }
-
-                MainTextField(userPostalCode.value,"your postal code...") {
+                MainTextField(userPostalCode.value,"Postal Code...",userPostalCode.value.isBlank()) {
                     userPostalCode.value = it
                 }
 
@@ -235,17 +285,29 @@ fun AddUserLocationDataDialog(
                     TextButton(onClick = {
 
                         if (
-                            (userAddress.value.isNotEmpty() || userAddress.value.isNotBlank()) &&
-                            (userPostalCode.value.isNotEmpty() || userPostalCode.value.isNotBlank())
+                            (userFirst_name.value.isNotBlank()) &&
+                            (userlast_name.value.isNotBlank()) &&
+                            (userPhone_Number.value.isNotBlank()) &&
+                            (userProvince.value.isNotBlank()) &&
+                            (userCity.value.isNotBlank()) &&
+                            (userStreet.value.isNotBlank())&&
+                            (userAddress.value.isNotBlank()) &&
+                            (userPostalCode.value.isNotBlank())
                         ) {
                             onSubmitClicked(
                                 userAddress.value,
                                 userPostalCode.value,
+                                userFirst_name.value,
+                                userlast_name.value,
+                                userPhone_Number.value,
+                                userProvince.value,
+                                userCity.value,
+                                userStreet.value,
                                 checkedState.value
                             )
                             onDismiss.invoke()
                         } else {
-                            Toast.makeText(context, "please write first...", Toast.LENGTH_SHORT)
+                            Toast.makeText(context, "Fill up the entries please...", Toast.LENGTH_SHORT)
                                 .show()
                         }
 
@@ -258,6 +320,7 @@ fun AddUserLocationDataDialog(
         }
     }
 }
+
 
 
 @Composable
@@ -303,11 +366,12 @@ fun ProfileToolbar(
 fun MainTextField(
     edtValue: String,
     hint: String,
+    isError: Boolean,
     onValueChange: (String) -> Unit
 ) {
     OutlinedTextField(
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-        label = {Text(hint)},
+        label = {Text(text=hint,color = if (isError) Color.Red else LocalContentColor.current)},
         value = edtValue,
         singleLine = true,
         onValueChange = onValueChange,
@@ -316,6 +380,7 @@ fun MainTextField(
             .fillMaxWidth(0.9f)
             .padding(top = 12.dp),
         shape = Shapes.medium,
+        isError = isError
     )
 }
 

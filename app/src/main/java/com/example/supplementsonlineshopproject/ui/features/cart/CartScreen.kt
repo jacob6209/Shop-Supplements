@@ -1,7 +1,9 @@
 package com.example.supplementsonlineshopproject.ui.features.cart
 
+import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Paint.Style
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -61,11 +63,14 @@ import com.example.supplementsonlineshopproject.model.data.UserCartInfo
 import com.example.supplementsonlineshopproject.model.repository.cart.CartInMemory
 import com.example.supplementsonlineshopproject.ui.features.main.MainViewModel
 import com.example.supplementsonlineshopproject.ui.features.product.ProductViewModel
+import com.example.supplementsonlineshopproject.ui.features.profile.AddUserLocationDataDialog
 import com.example.supplementsonlineshopproject.ui.theme.Blue
 import com.example.supplementsonlineshopproject.ui.theme.Shapes
 import com.example.supplementsonlineshopproject.ui.theme.priceBackground
 import com.example.supplementsonlineshopproject.util.BASE_URL
 import com.example.supplementsonlineshopproject.util.MyScreens
+import com.example.supplementsonlineshopproject.util.NetworkChecker
+import com.example.supplementsonlineshopproject.util.PAYMENT_PENDING
 import com.example.supplementsonlineshopproject.util.stylePrice
 import com.google.accompanist.pager.ExperimentalPagerApi
 import dev.burnoo.cokoin.navigation.getNavController
@@ -130,12 +135,160 @@ fun CartScreen() {
             }
 
         }
+        PurchaseAll(totalprice = viewModel.totalPrice.value.toString()) {
+            if (viewModel.productList.value.isNotEmpty()) {
+                val locationData = viewModel.getUserLocation()
+                val locationDataF_name = viewModel.getFirstName()
+                val locationDataL_name = viewModel.getLastName()
+                val locationData_Phone = viewModel.getPhone_number()
+                val locationData_Province = viewModel.getFirstName()
+                val locationData_City = viewModel.getCity()
+                val locationData_Street = viewModel.getStreet()
 
+                if (locationData.first.isEmpty() || locationData.second.isEmpty() || locationDataF_name.isEmpty() || locationDataL_name.isEmpty() ||
+                    locationData_Phone.isEmpty() || locationData_Province.isEmpty() || locationData_City.isEmpty() || locationData_Street.isEmpty()
+                ) {
+                    getDialogState.value = true
+
+                } else {
+//                    pardakht
+                    viewModel.purchaseAll(
+                        cartId =viewModel.cartRepository.getCartId()!!,
+                        locationData.first,
+                        locationData.second,
+                        locationDataF_name,
+                        locationDataL_name,
+                        locationData_Phone,
+                        locationData_Province,
+                        locationData_City,
+                        locationData_Street
+                    ) {success,linke->
+                        if (success){
+                            viewModel.setPaymentStatus(PAYMENT_PENDING)
+                            Toast.makeText(context, "pay using zarinpal...", Toast.LENGTH_SHORT).show()
+//                            to doooooooooooooooooooooo
+//                            viewModel.paymentProcess(id)
+                            val intent=Intent(Intent.ACTION_VIEW, Uri.parse(linke))
+                            context.startActivities(arrayOf(intent))
+                        }else{
+                            Toast.makeText(context, "Problem in Payment", Toast.LENGTH_SHORT).show()
+                        }
+
+                    }
+                }
+
+            } else {
+                Toast.makeText(context, "Please add some product first...", Toast.LENGTH_SHORT)
+                    .show()
+            }
+        }
+        if(getDialogState.value){
+            AddUserLocationDataDialog(
+                showSaveLocation = true,
+                onDismiss = {getDialogState.value=false },
+                onSubmitClicked = {address,postalcode,f_name,l_name,phone,province,city,street,isChecked->
+                        if (NetworkChecker(context).isInternetConnected){
+                            if (isChecked){
+                                viewModel.setUserLocation(address,postalcode,f_name,l_name,phone,province,city,street)
+                            }
+
+//                            pardakht
+                            viewModel.purchaseAll(
+                                cartId =viewModel.cartRepository.getCartId()!!,
+                                 address,
+                                postalcode,
+                                f_name,
+                                l_name,
+                                phone,
+                                province,
+                                city,
+                                street
+                            ) {success,id->
+                                if (success){
+                                    viewModel.setPaymentStatus(PAYMENT_PENDING)
+                                    val intent=Intent(Intent.ACTION_VIEW, Uri.parse(id))
+                                    context.startActivities(arrayOf(intent))
+                                }else{
+                                    Toast.makeText(context, "Problem in Payment", Toast.LENGTH_SHORT).show()
+                                }
+
+                            }
+
+                        }else{
+                            Toast.makeText(context, "Check your internet connection please!", Toast.LENGTH_SHORT).show()
+                        }
+
+                }
+            )
+        }
     }
 
 }
 
 
+@Composable
+fun PurchaseAll(
+    totalprice: String,
+    onpurchaseClicked: () -> Unit
+) {
+    val context = LocalContext.current
+    val configuration = LocalConfiguration.current
+    val fraction =if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) 0.15f else 0.07f
+    Surface(
+        color = Color.White,
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(fraction)
+    ) {
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Button(
+                modifier = Modifier
+                    .padding(start = 16.dp)
+                    .size(182.dp, 40.dp),
+                onClick = {
+                    if (NetworkChecker(context).isInternetConnected){
+                        onpurchaseClicked.invoke()
+                    }else{
+                        Toast.makeText(context, "Check Your Internet Connection", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+            ) {
+                Text(
+                    modifier = Modifier.padding(2.dp),
+                    text = "Let's Purchase !",
+                    style = TextStyle(
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.White
+                    )
+                )
+
+            }
+
+            Surface(
+                modifier = Modifier
+                    .padding(end = 16.dp)
+                    .clip(shape = Shapes.large),
+                color = priceBackground
+
+            ) {
+                Text(
+                    modifier = Modifier.padding(vertical = 6.dp, horizontal = 8.dp),
+                    text = "total: ${stylePrice(totalprice)}",
+                    style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                )
+
+            }
+
+        }
+    }
+
+}
 
 @Composable
 fun NoDataAnimation() {

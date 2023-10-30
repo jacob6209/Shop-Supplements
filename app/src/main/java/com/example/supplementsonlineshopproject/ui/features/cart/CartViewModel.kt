@@ -9,6 +9,7 @@ import com.example.supplementsonlineshopproject.model.net.ApiService
 import com.example.supplementsonlineshopproject.model.repository.cart.CartInMemory
 import com.example.supplementsonlineshopproject.model.repository.cart.CartRepository
 import com.example.supplementsonlineshopproject.model.repository.product.ProductRepository
+import com.example.supplementsonlineshopproject.model.repository.user.UserRepository
 import com.example.supplementsonlineshopproject.ui.features.main.MainViewModel
 import com.example.supplementsonlineshopproject.util.NetworkChecker
 import com.example.supplementsonlineshopproject.util.coroutinExceptionHandler
@@ -18,15 +19,53 @@ import okhttp3.Response
 
 class CartViewModel(
     val cartRepository: CartRepository,
-    private val productRepository: ProductRepository
+    private val productRepository: ProductRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
     val productList = mutableStateOf(listOf<UserCartInfo>())
     val productdata = mutableStateOf<List<ProductResponse>>(listOf())
     val totalPrice = mutableStateOf(0)
     val errorMessage = mutableStateOf<String?>(null)
     val isChangingNumber= mutableStateOf(Pair("",false))
+//    val order_id= mutableStateOf("")
+//    val process_Link= mutableStateOf("")
     private fun calculateTotalPrice(cartItems: List<UserCartInfo>): Int {
         return cartItems.sumBy { it.item_total.toInt() }
+    }
+    fun getUserLocation():Pair<String,String>{
+        return  userRepository.getUserLocation()
+    }
+    fun setUserLocation(address:String,postalcode:String,f_name:String,l_name:String,phone_number:String,province:String,city:String,street:String){
+        userRepository.saveUserLocation(address,postalcode,f_name,l_name,phone_number,province,city,street)
+
+    }
+    fun purchaseAll(
+        cartId: String,
+        address: String,
+        postalcode: String,
+        f_name:String,
+        l_name:String,
+        phone:String,
+        province:String,
+        city:String,
+        street:String,
+        isSuccess:(Boolean,String)->Unit){
+        viewModelScope.launch (coroutinExceptionHandler){
+            val result=cartRepository.submitOrder(cartId,address,postalcode,f_name,l_name,phone,province,city,street)
+            isSuccess.invoke(result.Success,result.Linke)
+        }
+    }
+//    fun paymentProcess(order_id:String){
+//        viewModelScope.launch (coroutinExceptionHandler){
+//            val result=cartRepository.paymentProcess(order_id)
+//            if (result.isSuccessful){
+//                process_Link.value=result.body()?.Linke!!
+//            }
+//        }
+//    }
+
+    fun setPaymentStatus(status:Int){
+        cartRepository.setPurchaseStatus(status)
     }
 
     fun loadCartdata() {
@@ -79,6 +118,50 @@ class CartViewModel(
 
 
     }
+
+    fun getFirstName():String{
+        return  userRepository.getFirst_Name()!!
+    }
+    fun setFirstName(f_name: String){
+        userRepository.SaveFirst_Name(f_name)
+    }
+
+    fun getLastName():String{
+        return  userRepository.getLast_Name()!!
+    }
+    fun setLastName(l_name: String){
+        userRepository.SaveLast_Name(l_name)
+    }
+
+    fun getPhone_number():String{
+        return  userRepository.getPhone_Number()!!
+    }
+    fun setPhone_number(Phone_number: String){
+        userRepository.SavePhone_Number(Phone_number)
+    }
+    fun getProvince():String{
+        return  userRepository.getProvince()!!
+    }
+    fun setProvince(province: String){
+        userRepository.SaveProvince(province)
+    }
+    fun getCity():String{
+        return  userRepository.getCity()!!
+    }
+    fun setCity(city: String){
+        userRepository.SaveCity(city)
+    }
+
+    fun getStreet():String{
+        return  userRepository.getStreet()!!
+    }
+    fun setStreet(street: String){
+        userRepository.SaveStreet(street)
+    }
+
+
+
+
 
 }
 

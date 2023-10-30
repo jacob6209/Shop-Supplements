@@ -48,7 +48,7 @@ class UserRepositoryImpl(
             val result = apiService.signIn(jsonObject)
 
             if (result.access.isNotEmpty()) {
-                TokenInMemory.saveTokens(email,result.refresh, result.access)
+                TokenInMemory.saveTokens(email, result.access,result.refresh)
                 saveToken(result.access)
                 saveRefreshToken(result.refresh)
                 saveUserLoginTime()
@@ -126,14 +126,30 @@ class UserRepositoryImpl(
         return sharedPref.getString("email",null)
     }
 
-    override fun saveUserLocation(address: String, postalCode: String) {
-        sharedPref.edit().putString("address",address).apply()
-        sharedPref.edit().putString("postalCode",postalCode).apply()
+    override fun saveUserLocation(
+        address: String, postalCode: String,
+        f_name: String,
+        l_name: String,
+        phone_number: String,
+        province: String,
+        city: String,
+        street: String
+    ) {
+        sharedPref.edit().putString("address", address).apply()
+        sharedPref.edit().putString("postalCode", postalCode).apply()
+        sharedPref.edit().putString("first_name",f_name).apply()
+        sharedPref.edit().putString("last_name",l_name).apply()
+        sharedPref.edit().putString("phone_number",phone_number).apply()
+        sharedPref.edit().putString("province",province).apply()
+        sharedPref.edit().putString("city",city).apply()
+        sharedPref.edit().putString("street",street).apply()
+
+
     }
 
     override fun getUserLocation(): Pair<String, String> {
-        val address=sharedPref.getString("address","Click to add")!!
-        val postalCode=sharedPref.getString("postalCode","Click to add")!!
+        val address=sharedPref.getString("address","")!!
+        val postalCode=sharedPref.getString("postalCode","")!!
         return  Pair(address,postalCode)
     }
 
@@ -144,6 +160,54 @@ class UserRepositoryImpl(
 
     override fun getUserLoginTime(): String {
         return sharedPref.getString("login_time","0")!!
+    }
+
+    override fun getFirst_Name(): String? {
+        return sharedPref.getString("first_name","")
+    }
+
+    override fun SaveFirst_Name(f_Name: String) {
+        sharedPref.edit().putString("first_name",f_Name).apply()
+    }
+
+    override fun getLast_Name(): String? {
+        return sharedPref.getString("last_name","")
+    }
+
+    override fun SaveLast_Name(l_Name: String) {
+        sharedPref.edit().putString("last_name",l_Name).apply()
+    }
+
+    override fun getPhone_Number(): String? {
+        return sharedPref.getString("phone_number","")
+    }
+
+    override fun SavePhone_Number(phone_Number: String) {
+        sharedPref.edit().putString("phone_number",phone_Number).apply()
+    }
+
+    override fun getProvince(): String? {
+        return sharedPref.getString("province","")
+    }
+
+    override fun SaveProvince(province: String) {
+        sharedPref.edit().putString("province",province).apply()
+    }
+
+    override fun getCity(): String? {
+        return sharedPref.getString("city","")
+    }
+
+    override fun SaveCity(city: String) {
+        sharedPref.edit().putString("city",city).apply()
+    }
+
+    override fun getStreet(): String? {
+        return sharedPref.getString("street","")
+    }
+
+    override fun SaveStreet(street: String) {
+        sharedPref.edit().putString("street",street).apply()
     }
 
 }

@@ -22,8 +22,14 @@
             android:theme="@style/Theme.SupplementsOnlineShopProject">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+<!--            Deep Linke  -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="jacsupplement" android:host="http://127.0.0.1:8000"/>
             </intent-filter>
 
             <meta-data

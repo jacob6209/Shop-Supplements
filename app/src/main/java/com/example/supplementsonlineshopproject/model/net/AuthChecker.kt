@@ -11,6 +11,7 @@ import okhttp3.Route
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
+
 class AuthChecker : Authenticator, KoinComponent {
     private val apiService: ApiService by inject()
 
@@ -32,27 +33,27 @@ class AuthChecker : Authenticator, KoinComponent {
         return null
     }
 
-        private fun refreshToken(): Boolean {
-            try {
-                val jsonObject = JsonObject().apply {
-                    addProperty("refresh", TokenInMemory.refreshToken)
+    private fun refreshToken(): Boolean {
+        try {
+            val jsonObject = JsonObject().apply {
+                addProperty("refresh", TokenInMemory.refreshToken)
 
-                }
-                val request: retrofit2.Response<RefreshToken> = apiService.refreshToken(jsonObject).execute()
-                if (request.body() != null) {
-                    if (request.body()!!.access.isNotEmpty()) {
-                        TokenInMemory.accessToken = request.body()!!.access
-                        return true
-                    }
-                }
-                return false
-            }catch (e:Exception){
-                val errorMessage = "Token refresh failed: ${e.message}"
-                Log.e("TokenRefresh", errorMessage)
-                throw TokenRefreshFailedException("Token refresh failed: ${e.message}")
             }
-
+            val request: retrofit2.Response<RefreshToken> = apiService.refreshToken(jsonObject).execute()
+            if (request.body() != null) {
+                if (request.body()!!.access.isNotEmpty()) {
+                    TokenInMemory.accessToken = request.body()!!.access
+                    return true
+                }
+            }
+            return false
+        }catch (e:Exception){
+            val errorMessage = "Token refresh failed: ${e.message}"
+            Log.e("TokenRefresh", errorMessage)
+            throw TokenRefreshFailedException("Token refresh failed: ${e.message}")
         }
 
     }
+
+}
 class TokenRefreshFailedException(message: String) : Exception(message)

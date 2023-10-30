@@ -207,7 +207,12 @@ fun ProductScreen(productId: Int) {
                     try{
                     viewModel.getProductCartId() {
                         viewModel.saveCartId(it)
+
+                        viewModel.addProductToCart(it,productId){result->
+                            Toast.makeText(context, result, Toast.LENGTH_SHORT).show()
+                        }
                     }
+
                     }catch (e:Exception){
                         throw ProductViewModel.CustomException("Error In Get Id Cart ${e.message}")
                     }
@@ -777,10 +782,10 @@ fun MainTextComment(
 
 //                  For Animation DotsPulsing
 //----------------------------------------------------------------------------------------------
-const val numberOfDots =5
+const val numberOfDots =3
 val dotSize = 24.dp
 val dotColor: Color = Color.White
-const val delayUnit = 200
+const val delayUnit = 400
 const val duration = numberOfDots * delayUnit
 val spaceBetween = 2.dp
 

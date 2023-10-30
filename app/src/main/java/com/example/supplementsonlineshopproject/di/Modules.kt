@@ -44,5 +44,5 @@ val myModules= module {
     viewModel{(isNetConnected:Boolean)->MainViewModel(get(),get(),isNetConnected)}
     viewModel{ProductViewModel(get(),get(),get())}
     viewModel{ ProfileViewModel(get())}
-    viewModel{ CartViewModel(get(),get())}
+    viewModel{ CartViewModel(get(),get(),get())}
 }
