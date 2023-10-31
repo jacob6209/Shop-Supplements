@@ -58,6 +58,7 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.supplementsonlineshopproject.R
+import com.example.supplementsonlineshopproject.model.data.Address
 import com.example.supplementsonlineshopproject.model.data.ProductResponse
 import com.example.supplementsonlineshopproject.model.data.UserCartInfo
 import com.example.supplementsonlineshopproject.model.repository.cart.CartInMemory
@@ -141,7 +142,7 @@ fun CartScreen() {
                 val locationDataF_name = viewModel.getFirstName()
                 val locationDataL_name = viewModel.getLastName()
                 val locationData_Phone = viewModel.getPhone_number()
-                val locationData_Province = viewModel.getFirstName()
+                val locationData_Province = viewModel.getProvince()
                 val locationData_City = viewModel.getCity()
                 val locationData_Street = viewModel.getStreet()
 
@@ -149,78 +150,84 @@ fun CartScreen() {
                     locationData_Phone.isEmpty() || locationData_Province.isEmpty() || locationData_City.isEmpty() || locationData_Street.isEmpty()
                 ) {
                     getDialogState.value = true
-
                 } else {
-//                    pardakht
+                    val addresses = listOf(
+                        Address(
+                            first_name = locationDataF_name,
+                            last_name = locationDataL_name,
+                            phone_number = locationData_Phone,
+                            province = locationData_Province,
+                            city = locationData_City,
+                            street = locationData_Street,
+                            address = locationData.first,
+                            zip_code = locationData.second,
+                        )
+                    )
+
                     viewModel.purchaseAll(
-                        cartId =viewModel.cartRepository.getCartId()!!,
-                        locationData.first,
-                        locationData.second,
-                        locationDataF_name,
-                        locationDataL_name,
-                        locationData_Phone,
-                        locationData_Province,
-                        locationData_City,
-                        locationData_Street
-                    ) {success,linke->
-                        if (success){
+                        cartId = viewModel.cartRepository.getCartId()!!,
+                        address = addresses
+                    ) { success, linke ->
+                        if (success) {
                             viewModel.setPaymentStatus(PAYMENT_PENDING)
-                            Toast.makeText(context, "pay using zarinpal...", Toast.LENGTH_SHORT).show()
-//                            to doooooooooooooooooooooo
-//                            viewModel.paymentProcess(id)
-                            val intent=Intent(Intent.ACTION_VIEW, Uri.parse(linke))
+                            Toast.makeText(context, "Pay using Zarinpal...", Toast.LENGTH_SHORT).show()
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(linke))
                             context.startActivities(arrayOf(intent))
-                        }else{
+                        } else {
                             Toast.makeText(context, "Problem in Payment", Toast.LENGTH_SHORT).show()
                         }
-
                     }
                 }
-
             } else {
-                Toast.makeText(context, "Please add some product first...", Toast.LENGTH_SHORT)
-                    .show()
+                Toast.makeText(context, "Please add some products first...", Toast.LENGTH_SHORT).show()
             }
         }
-        if(getDialogState.value){
+
+        if (getDialogState.value) {
             AddUserLocationDataDialog(
                 showSaveLocation = true,
-                onDismiss = {getDialogState.value=false },
-                onSubmitClicked = {address,postalcode,f_name,l_name,phone,province,city,street,isChecked->
-                        if (NetworkChecker(context).isInternetConnected){
-                            if (isChecked){
-                                viewModel.setUserLocation(address,postalcode,f_name,l_name,phone,province,city,street)
-                            }
-
-//                            pardakht
-                            viewModel.purchaseAll(
-                                cartId =viewModel.cartRepository.getCartId()!!,
-                                 address,
-                                postalcode,
-                                f_name,
-                                l_name,
-                                phone,
-                                province,
-                                city,
-                                street
-                            ) {success,id->
-                                if (success){
-                                    viewModel.setPaymentStatus(PAYMENT_PENDING)
-                                    val intent=Intent(Intent.ACTION_VIEW, Uri.parse(id))
-                                    context.startActivities(arrayOf(intent))
-                                }else{
-                                    Toast.makeText(context, "Problem in Payment", Toast.LENGTH_SHORT).show()
-                                }
-
-                            }
-
-                        }else{
-                            Toast.makeText(context, "Check your internet connection please!", Toast.LENGTH_SHORT).show()
+                onDismiss = { getDialogState.value = false },
+                onSubmitClicked = { address, postalcode, f_name, l_name, phone, province, city, street, isChecked ->
+                    if (NetworkChecker(context).isInternetConnected) {
+                        if (isChecked) {
+                            viewModel.setUserLocation(address, postalcode, f_name, l_name, phone, province, city, street)
                         }
 
+                        // Create a list of Address objects
+                        val address = listOf(
+                            Address(
+                                first_name = f_name,
+                                last_name = l_name,
+                                phone_number = phone,
+                                province = province,
+                                city = city,
+                                street = street,
+                                address = address,
+                                zip_code = postalcode,
+                            )
+                        )
+
+                        // Perform the purchase with the list of addresses
+                        viewModel.purchaseAll(
+                            cartId = viewModel.cartRepository.getCartId()!!,
+                            address = address
+                        ) { success, id ->
+                            if (success) {
+                                viewModel.setPaymentStatus(PAYMENT_PENDING)
+                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(id))
+                                context.startActivities(arrayOf(intent))
+                            } else {
+                                Toast.makeText(context, "Problem in Payment", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+
+                    } else {
+                        Toast.makeText(context, "Check your internet connection please!", Toast.LENGTH_SHORT).show()
+                    }
                 }
             )
         }
+
     }
 
 }

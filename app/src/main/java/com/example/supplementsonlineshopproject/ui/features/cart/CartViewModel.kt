@@ -3,6 +3,7 @@ package com.example.supplementsonlineshopproject.ui.features.cart
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.supplementsonlineshopproject.model.data.Address
 import com.example.supplementsonlineshopproject.model.data.ProductResponse
 import com.example.supplementsonlineshopproject.model.data.UserCartInfo
 import com.example.supplementsonlineshopproject.model.net.ApiService
@@ -41,17 +42,10 @@ class CartViewModel(
     }
     fun purchaseAll(
         cartId: String,
-        address: String,
-        postalcode: String,
-        f_name:String,
-        l_name:String,
-        phone:String,
-        province:String,
-        city:String,
-        street:String,
-        isSuccess:(Boolean,String)->Unit){
+        address: List<Address>,
+        isSuccess:(Boolean, String)->Unit){
         viewModelScope.launch (coroutinExceptionHandler){
-            val result=cartRepository.submitOrder(cartId,address,postalcode,f_name,l_name,phone,province,city,street)
+            val result=cartRepository.submitOrder(cartId,address)
             isSuccess.invoke(result.Success,result.Linke)
         }
     }

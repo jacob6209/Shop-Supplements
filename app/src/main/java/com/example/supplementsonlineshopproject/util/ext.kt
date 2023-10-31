@@ -2,6 +2,7 @@ package com.example.supplementsonlineshopproject.util
 
 import android.graphics.Paint.Style
 import android.util.Log
+import com.example.supplementsonlineshopproject.model.data.Address
 import kotlinx.coroutines.CoroutineExceptionHandler
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -35,4 +36,20 @@ fun styleTime(timeInMillis:Long):String{
     val calender=Calendar.getInstance()
     calender.timeInMillis = timeInMillis
     return formatter.format(calender.time)
+}
+
+fun convertAddressListToMap(addressList: List<Address>): Map<String, String> {
+    val addressMap = mutableMapOf<String, String>()
+    if (addressList.isNotEmpty()) {
+        val address = addressList[0] // Assuming you are only dealing with one address in the list
+        addressMap["first_name"] = address.first_name
+        addressMap["last_name"] = address.last_name
+        addressMap["phone_number"] = address.phone_number
+        addressMap["province"] = address.province
+        addressMap["city"] = address.city
+        addressMap["street"] = address.street
+        addressMap["address"] = address.address
+        addressMap["zip_code"] = address.zip_code
+    }
+    return addressMap
 }
