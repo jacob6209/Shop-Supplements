@@ -2,7 +2,6 @@ package com.example.supplementsonlineshopproject.ui.features.cart
 
 import android.content.Intent
 import android.content.res.Configuration
-import android.graphics.Paint.Style
 import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
@@ -19,8 +18,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Badge
-import androidx.compose.material.BadgedBox
 import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
@@ -33,7 +30,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -61,9 +57,6 @@ import com.example.supplementsonlineshopproject.R
 import com.example.supplementsonlineshopproject.model.data.Address
 import com.example.supplementsonlineshopproject.model.data.ProductResponse
 import com.example.supplementsonlineshopproject.model.data.UserCartInfo
-import com.example.supplementsonlineshopproject.model.repository.cart.CartInMemory
-import com.example.supplementsonlineshopproject.ui.features.main.MainViewModel
-import com.example.supplementsonlineshopproject.ui.features.product.ProductViewModel
 import com.example.supplementsonlineshopproject.ui.features.profile.AddUserLocationDataDialog
 import com.example.supplementsonlineshopproject.ui.theme.Blue
 import com.example.supplementsonlineshopproject.ui.theme.Shapes
@@ -73,7 +66,6 @@ import com.example.supplementsonlineshopproject.util.MyScreens
 import com.example.supplementsonlineshopproject.util.NetworkChecker
 import com.example.supplementsonlineshopproject.util.PAYMENT_PENDING
 import com.example.supplementsonlineshopproject.util.stylePrice
-import com.google.accompanist.pager.ExperimentalPagerApi
 import dev.burnoo.cokoin.navigation.getNavController
 import dev.burnoo.cokoin.navigation.getNavViewModel
 
@@ -167,11 +159,11 @@ fun CartScreen() {
                     viewModel.purchaseAll(
                         cartId = viewModel.cartRepository.getCartId()!!,
                         address = addresses
-                    ) { success, linke ->
+                    ) { success, link ->
                         if (success) {
                             viewModel.setPaymentStatus(PAYMENT_PENDING)
                             Toast.makeText(context, "Pay using Zarinpal...", Toast.LENGTH_SHORT).show()
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(linke))
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
                             context.startActivities(arrayOf(intent))
                         } else {
                             Toast.makeText(context, "Problem in Payment", Toast.LENGTH_SHORT).show()
@@ -211,10 +203,10 @@ fun CartScreen() {
                         viewModel.purchaseAll(
                             cartId = viewModel.cartRepository.getCartId()!!,
                             address = address
-                        ) { success, id ->
+                        ) { success, link ->
                             if (success) {
                                 viewModel.setPaymentStatus(PAYMENT_PENDING)
-                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(id))
+                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
                                 context.startActivities(arrayOf(intent))
                             } else {
                                 Toast.makeText(context, "Problem in Payment", Toast.LENGTH_SHORT).show()
@@ -416,7 +408,12 @@ fun CartItem(
 
                     ) {
                         Text(
-                            modifier = Modifier.padding(vertical = 6.dp, horizontal = 8.dp),
+                            modifier = Modifier.padding(
+                                top = 6.dp,
+                                bottom = 6.dp,
+                                start = 8.dp,
+                                end = 8.dp
+                            ),
                             text = stylePrice(
                                 (data.unit_price.toInt() * dataCartInfo.quantity!!).toString()
                             ),
@@ -440,7 +437,7 @@ fun CartItem(
                             if (dataCartInfo.quantity == 1) {
                                 IconButton(onClick = { OnRemoveItemClicked.invoke(dataCartInfo.id.toString()) }) {
                                     Icon(
-                                        modifier = Modifier.padding(horizontal = 4.dp),
+                                        modifier = Modifier.padding(end = 4.dp, start = 4.dp),
                                         imageVector = Icons.Default.Delete,
                                         contentDescription = null
                                     )
@@ -448,6 +445,7 @@ fun CartItem(
                             } else {
                                 IconButton(onClick = { OnRemoveItemClicked.invoke(dataCartInfo.id.toString()) }) {
                                     Icon(
+                                        modifier = Modifier.padding(end = 4.dp, start = 4.dp),
                                         painter = painterResource(id = R.drawable.ic_minus),
                                         contentDescription = null
                                     )
@@ -473,7 +471,7 @@ fun CartItem(
 //                            Add Button +
                             IconButton(onClick = { OnAddItemClicked.invoke(dataCartInfo.product.id.toString()) }) {
                                 Icon(
-                                    modifier = Modifier.padding(horizontal = 4.dp),
+                                    modifier = Modifier.padding(end = 4.dp, start = 4.dp),
                                     imageVector = Icons.Default.Add,
                                     contentDescription = null
                                 )

@@ -696,9 +696,13 @@ fun SliderBanner(
         while (true) {
             yield()
             delay(2600)
-            pagerState.animateScrollToPage(
-                page = (pagerState.currentPage + 1) % (pagerState.pageCount)
-            )
+            // Check if there are photos to display
+            if (pagerState.pageCount > 0) {
+                pagerState.animateScrollToPage(
+                    page = (pagerState.currentPage + 1) % (pagerState.pageCount)
+                )
+            }
+
         }
     }
 
@@ -732,9 +736,17 @@ fun SliderBanner(
                         )
                     }
             ) {
+//                val defaultImageUrl = "${BASE_URL}static/img/no-image-placeholder.png"
 
+//                    BASE_URL + data.images[page].image
+//                } else {
+//                    defaultImageUrl
+//                }
+//                    data.images.isNotEmpty() && data.images[page].image.isNotEmpty()
+
+                val imageUrl =BASE_URL + data.images[page].image
                 AsyncImage(
-                    model = BASE_URL + data.images[page].image,
+                    model = imageUrl,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier

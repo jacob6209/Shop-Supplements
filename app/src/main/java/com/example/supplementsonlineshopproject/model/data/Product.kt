@@ -50,7 +50,7 @@ data class Image(
     val image: String,
     val product: Int,
     @Transient
-    val image_url: String // Add the image URL property here
+    val image_url: String
 )
 data class Comment(
     val body: String,

@@ -6,17 +6,12 @@ import androidx.lifecycle.viewModelScope
 import com.example.supplementsonlineshopproject.model.data.Address
 import com.example.supplementsonlineshopproject.model.data.ProductResponse
 import com.example.supplementsonlineshopproject.model.data.UserCartInfo
-import com.example.supplementsonlineshopproject.model.net.ApiService
-import com.example.supplementsonlineshopproject.model.repository.cart.CartInMemory
 import com.example.supplementsonlineshopproject.model.repository.cart.CartRepository
 import com.example.supplementsonlineshopproject.model.repository.product.ProductRepository
 import com.example.supplementsonlineshopproject.model.repository.user.UserRepository
-import com.example.supplementsonlineshopproject.ui.features.main.MainViewModel
-import com.example.supplementsonlineshopproject.util.NetworkChecker
 import com.example.supplementsonlineshopproject.util.coroutinExceptionHandler
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import okhttp3.Response
 
 class CartViewModel(
     val cartRepository: CartRepository,
@@ -28,8 +23,6 @@ class CartViewModel(
     val totalPrice = mutableStateOf(0)
     val errorMessage = mutableStateOf<String?>(null)
     val isChangingNumber= mutableStateOf(Pair("",false))
-//    val order_id= mutableStateOf("")
-//    val process_Link= mutableStateOf("")
     private fun calculateTotalPrice(cartItems: List<UserCartInfo>): Int {
         return cartItems.sumBy { it.item_total.toInt() }
     }
@@ -58,7 +51,7 @@ class CartViewModel(
 //        }
 //    }
 
-    fun setPaymentStatus(status:Int){
+    fun setPaymentStatus(status: String){
         cartRepository.setPurchaseStatus(status)
     }
 

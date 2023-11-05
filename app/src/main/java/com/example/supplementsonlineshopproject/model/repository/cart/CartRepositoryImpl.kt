@@ -3,11 +3,13 @@ package com.example.supplementsonlineshopproject.model.repository.cart
 import android.content.SharedPreferences
 import com.example.supplementsonlineshopproject.model.data.AddProductToCartResponse
 import com.example.supplementsonlineshopproject.model.data.Address
+import com.example.supplementsonlineshopproject.model.data.CheckOut
+import com.example.supplementsonlineshopproject.model.data.CheckoutOrder
 import com.example.supplementsonlineshopproject.model.data.SubmitOrder
 import com.example.supplementsonlineshopproject.model.data.PaymentCallBackResponse
 import com.example.supplementsonlineshopproject.model.data.UserCartInfo
 import com.example.supplementsonlineshopproject.model.net.ApiService
-import com.example.supplementsonlineshopproject.util.NO_PAYMENT
+import com.example.supplementsonlineshopproject.util.PAYMENT_UNPAID
 import com.example.supplementsonlineshopproject.util.convertAddressListToMap
 import com.google.gson.Gson
 import com.google.gson.JsonArray
@@ -135,6 +137,11 @@ class CartRepositoryImpl(
         return apiService.PaymentProcess(order_id)
     }
 
+    override suspend fun checkOut(orderId: String): Response<CheckoutOrder> {
+        return  apiService.checkOut(orderId)
+
+    }
+
     override fun setOrderId(order_id: String) {
         sharepref.edit().putString("order_id", order_id).apply()
     }
@@ -143,12 +150,12 @@ class CartRepositoryImpl(
         return sharepref.getString("order_id", "0")!!
     }
 
-    override fun setPurchaseStatus(status: Int) {
-        sharepref.edit().putInt("purchase_status", status).apply()
+    override fun setPurchaseStatus(status: String) {
+        sharepref.edit().putString("purchase_status", status).apply()
     }
 
-    override fun getPurchaseStatus(): Int {
-        return sharepref.getInt("purchase_status", NO_PAYMENT)
+    override fun getPurchaseStatus(): String? {
+        return sharepref.getString("purchase_status", PAYMENT_UNPAID)
     }
 
 }

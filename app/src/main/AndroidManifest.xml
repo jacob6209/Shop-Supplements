@@ -29,7 +29,8 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="jacsupplement" android:host="http://127.0.0.1:8000"/>
+                <data android:scheme="jacsupplement" />
+<!--                <data android:scheme="http" android:host="192.168.0.100" android:port="8000" />-->
             </intent-filter>
 
             <meta-data

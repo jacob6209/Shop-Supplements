@@ -3,6 +3,8 @@ package com.example.supplementsonlineshopproject.model.net
 import com.example.supplementsonlineshopproject.model.data.AddNewCommentResponse
 import com.example.supplementsonlineshopproject.model.data.AddProductToCartResponse
 import com.example.supplementsonlineshopproject.model.data.AdsResponse
+import com.example.supplementsonlineshopproject.model.data.CheckOut
+import com.example.supplementsonlineshopproject.model.data.CheckoutOrder
 import com.example.supplementsonlineshopproject.model.data.CreateCartResponse
 import com.example.supplementsonlineshopproject.model.data.SubmitOrder
 import com.example.supplementsonlineshopproject.model.data.LoginResponse
@@ -63,8 +65,14 @@ interface ApiService {
     suspend fun submitOrder(@Body jsonObject: JsonObject):SubmitOrder
 
 
+
+
+    @GET("store/orders/{order_id}/")
+    suspend fun checkOut(@Path ("order_id") id:String) :Response<CheckoutOrder>
+
     @POST("payment/process/{Order_id}")
     suspend fun PaymentProcess(@Path ("Order_id") id: String):Response<PaymentCallBackResponse>
+
 
 
 

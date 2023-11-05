@@ -5,7 +5,7 @@ import com.example.supplementsonlineshopproject.model.data.ProductResponse
 
 const val KEY_PRODUCT_ARG="productId"
 const val KEY_CATEGORY_ARG = "categoryTitle"
-const val BASE_URL="http://192.168.1.4:8000/"
+const val BASE_URL="http://192.168.0.102:8000/"
 const val VALUE_SUCCESS="true"
 const val VALUE_NOT_SUCCESS="not_success"
 val EMPTY_PRODUCT=ProductResponse(1,1.5,1,"", emptyList(),"",true,
@@ -28,7 +28,7 @@ val TAGS= listOf(
     "Most Visited",
     "Highest Quality"
 )
-const val PAYMENT_SUCCESS=1
-const val PAYMENT_PENDING=0
-const val PAYMENT_FAIL=-1
-const val NO_PAYMENT=-2
+const val PAYMENT_PAID="p"
+const val PAYMENT_PENDING="pn"
+const val PAYMENT_UNPAID="u"
+const val PAYMENT_CANCEL="c"
