@@ -37,6 +37,8 @@ class MainViewModel(
             if (result.isSuccessful){
                 checkoutData.value=result.body()!!
                 showPaymentDialog.value=true
+
+                
             }
 
         }

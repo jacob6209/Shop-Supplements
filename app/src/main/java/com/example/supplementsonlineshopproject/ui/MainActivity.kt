@@ -9,6 +9,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
@@ -20,7 +21,6 @@ import com.example.supplementsonlineshopproject.model.repository.user.UserReposi
 import com.example.supplementsonlineshopproject.ui.features.IntroScreen
 import com.example.supplementsonlineshopproject.ui.features.cart.CartScreen
 import com.example.supplementsonlineshopproject.ui.features.category.CategoryScreen
-//import com.example.supplementsonlineshopproject.ui.features.category.CategoryScreen
 import com.example.supplementsonlineshopproject.ui.features.main.MainScreen
 import com.example.supplementsonlineshopproject.ui.features.product.ProductScreen
 import com.example.supplementsonlineshopproject.ui.features.profile.ProfileScreen
@@ -32,15 +32,18 @@ import com.example.supplementsonlineshopproject.ui.theme.MainAppTheme
 import com.example.supplementsonlineshopproject.util.KEY_CATEGORY_ARG
 import com.example.supplementsonlineshopproject.util.KEY_PRODUCT_ARG
 import com.example.supplementsonlineshopproject.util.MyScreens
+import com.google.firebase.messaging.FirebaseMessaging
 import dev.burnoo.cokoin.Koin
 import dev.burnoo.cokoin.get
 import dev.burnoo.cokoin.navigation.KoinNavHost
+import kotlinx.coroutines.tasks.await
 import org.koin.android.ext.koin.androidContext
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
 
             Koin(appDeclaration = {
@@ -55,6 +58,15 @@ class MainActivity : ComponentActivity() {
                     ){
                         val userRepository:UserRepository=get()
                         userRepository.loadToken()
+                        FirebaseMessaging.getInstance().subscribeToTopic("staff_group")
+                        // LaunchedEffect to perform the FCM token retrieval
+//                        LaunchedEffect(Unit) {
+//                            val fcmToken = FirebaseMessaging.getInstance().token.await()
+//                            println("FCM Token: $fcmToken")
+//                            // Save or use the token as needed
+//                        }
+//                        ---------
+
                         SupplementsUi()
                     }
 
