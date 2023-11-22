@@ -3,6 +3,7 @@ package com.example.supplementsonlineshopproject.ui
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
@@ -15,6 +16,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.supplementsonlineshopproject.EventShowTrophy
 import com.example.supplementsonlineshopproject.di.myModules
 import com.example.supplementsonlineshopproject.model.repository.TokenInMemory
 import com.example.supplementsonlineshopproject.model.repository.user.UserRepository
@@ -37,6 +39,9 @@ import dev.burnoo.cokoin.Koin
 import dev.burnoo.cokoin.get
 import dev.burnoo.cokoin.navigation.KoinNavHost
 import kotlinx.coroutines.tasks.await
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import org.koin.android.ext.koin.androidContext
 
 class MainActivity : ComponentActivity() {
@@ -76,6 +81,23 @@ class MainActivity : ComponentActivity() {
 
         }
     }
+    @Subscribe(threadMode =ThreadMode.MAIN,sticky = true)
+    fun onEventBus(event:EventShowTrophy){
+        showToast(event.message)
+    }
+    override fun onStart() {
+        super.onStart()
+        EventBus.getDefault().register(this)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        EventBus.getDefault().unregister(this)
+    }
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
 }
 
 

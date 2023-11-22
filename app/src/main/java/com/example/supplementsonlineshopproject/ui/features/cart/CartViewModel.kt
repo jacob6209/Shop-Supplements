@@ -1,8 +1,10 @@
 package com.example.supplementsonlineshopproject.ui.features.cart
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.supplementsonlineshopproject.EventShowTrophy
 import com.example.supplementsonlineshopproject.model.data.Address
 import com.example.supplementsonlineshopproject.model.data.ProductResponse
 import com.example.supplementsonlineshopproject.model.data.UserCartInfo
@@ -12,6 +14,8 @@ import com.example.supplementsonlineshopproject.model.repository.user.UserReposi
 import com.example.supplementsonlineshopproject.util.coroutinExceptionHandler
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.greenrobot.eventbus.EventBus
+import org.json.JSONObject
 
 class CartViewModel(
     val cartRepository: CartRepository,
@@ -81,72 +85,92 @@ class CartViewModel(
         }
     }
 
-    fun addItem(cartId:String,productId:String){
+    fun addItem(cartId:String,productId:String) {
         viewModelScope.launch {
-            isChangingNumber.value=isChangingNumber.value.copy(productId,true)
-            val result=cartRepository.addToCart(cartId,productId)
-            if (result.isSuccessful){
+            isChangingNumber.value = isChangingNumber.value.copy(productId, true)
+            val result = cartRepository.addToCart(cartId, productId)
+            if (result.isSuccessful) {
                 loadCartdata()
+            } else {
+                if (result.code() == 400) { // Check for a bad request status code
+                    // Handle bad request error
+                    val responseBody = result.errorBody()?.string()
+                    val errorJson = JSONObject(responseBody)
+                    val errorMessage = errorJson.optString("error", "Unknown error")
+
+                    // Now you can use `errorMessage` as the specific error message
+                    EventBus.getDefault().postSticky(EventShowTrophy(errorMessage))
+                } else {
+                    // Handle other error cases
+                    val resltMsg = result.message()
+                    EventBus.getDefault().postSticky(EventShowTrophy(resltMsg))
+                }
             }
             delay(100)
-            isChangingNumber.value=isChangingNumber.value.copy(productId,false)
+            isChangingNumber.value = isChangingNumber.value.copy(productId, false)
         }
     }
-    fun removeItem(cartId:String,productId:String){
-        viewModelScope.launch {
-            isChangingNumber.value=isChangingNumber.value.copy(productId,true)
-            val result=cartRepository.removeFromCart(cartId,productId)
-            if (result.isSuccessful){
-                loadCartdata()
+        fun removeItem(cartId: String, productId: String) {
+            viewModelScope.launch {
+                isChangingNumber.value = isChangingNumber.value.copy(productId, true)
+                val result = cartRepository.removeFromCart(cartId, productId)
+                if (result.isSuccessful) {
+                    loadCartdata()
+                }
+                delay(100)
+                isChangingNumber.value = isChangingNumber.value.copy(productId, false)
             }
-            delay(100)
-            isChangingNumber.value=isChangingNumber.value.copy(productId,false)
+
+
         }
 
+        fun getFirstName(): String {
+            return userRepository.getFirst_Name()!!
+        }
 
-    }
+        fun setFirstName(f_name: String) {
+            userRepository.SaveFirst_Name(f_name)
+        }
 
-    fun getFirstName():String{
-        return  userRepository.getFirst_Name()!!
-    }
-    fun setFirstName(f_name: String){
-        userRepository.SaveFirst_Name(f_name)
-    }
+        fun getLastName(): String {
+            return userRepository.getLast_Name()!!
+        }
 
-    fun getLastName():String{
-        return  userRepository.getLast_Name()!!
-    }
-    fun setLastName(l_name: String){
-        userRepository.SaveLast_Name(l_name)
-    }
+        fun setLastName(l_name: String) {
+            userRepository.SaveLast_Name(l_name)
+        }
 
-    fun getPhone_number():String{
-        return  userRepository.getPhone_Number()!!
-    }
-    fun setPhone_number(Phone_number: String){
-        userRepository.SavePhone_Number(Phone_number)
-    }
-    fun getProvince():String{
-        return  userRepository.getProvince()!!
-    }
-    fun setProvince(province: String){
-        userRepository.SaveProvince(province)
-    }
-    fun getCity():String{
-        return  userRepository.getCity()!!
-    }
-    fun setCity(city: String){
-        userRepository.SaveCity(city)
-    }
+        fun getPhone_number(): String {
+            return userRepository.getPhone_Number()!!
+        }
 
-    fun getStreet():String{
-        return  userRepository.getStreet()!!
-    }
-    fun setStreet(street: String){
-        userRepository.SaveStreet(street)
-    }
+        fun setPhone_number(Phone_number: String) {
+            userRepository.SavePhone_Number(Phone_number)
+        }
 
+        fun getProvince(): String {
+            return userRepository.getProvince()!!
+        }
 
+        fun setProvince(province: String) {
+            userRepository.SaveProvince(province)
+        }
+
+        fun getCity(): String {
+            return userRepository.getCity()!!
+        }
+
+        fun setCity(city: String) {
+            userRepository.SaveCity(city)
+        }
+
+        fun getStreet(): String {
+            return userRepository.getStreet()!!
+        }
+
+        fun setStreet(street: String) {
+            userRepository.SaveStreet(street)
+        }
 
 
 
