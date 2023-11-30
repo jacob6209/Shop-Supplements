@@ -1,6 +1,5 @@
 package com.example.supplementsonlineshopproject.ui.features.main
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -15,28 +14,37 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Badge
 import androidx.compose.material.BadgedBox
 import androidx.compose.material.Card
+import androidx.compose.material.Divider
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.RadioButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,6 +52,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -51,12 +60,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
 import com.example.supplementsonlineshopproject.R
 import com.example.supplementsonlineshopproject.model.data.AdsResponse
 import com.example.supplementsonlineshopproject.model.data.CheckOut
 import com.example.supplementsonlineshopproject.model.data.CheckoutOrder
 import com.example.supplementsonlineshopproject.model.data.ProductResponse
+import com.example.supplementsonlineshopproject.ui.features.product.dotSize
 import com.example.supplementsonlineshopproject.ui.theme.BackgroundMain
 import com.example.supplementsonlineshopproject.ui.theme.Blue
 import com.example.supplementsonlineshopproject.ui.theme.CardViewBackgroundItem
@@ -74,7 +85,9 @@ import com.example.supplementsonlineshopproject.util.stylePrice
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dev.burnoo.cokoin.navigation.getNavController
 import dev.burnoo.cokoin.navigation.getNavViewModel
+import kotlinx.coroutines.delay
 import org.koin.core.parameter.parametersOf
+import java.util.Locale
 
 
 @Preview(showBackground = true)
@@ -100,6 +113,7 @@ fun MainScreen() {
     val viewModel = getNavViewModel<MainViewModel>(
         parameters = { parametersOf(NetworkChecker(context).isInternetConnected) }
     )
+    viewModel.loadLocation(context)  //load Location Setting
 
     if (NetworkChecker(context).isInternetConnected) {
         viewModel.loadBadgeNumber()
@@ -119,9 +133,12 @@ fun MainScreen() {
                     }else{
                         Toast.makeText(context, "Check Your Internet Connection ", Toast.LENGTH_SHORT).show()
                     }
-                }, onProfilClicked = {
+                },
+                onProfilClicked = {
                     navigation.navigate(MyScreens.ProfileScreen.route)
-                })
+                },
+                viewModel = viewModel
+                )
         }
 
     ) { innerPadding ->    /* avoid overlapping with the system insets (like the status bar and navigation bar)    */
@@ -392,9 +409,9 @@ fun BigPictureTablighat(ads: AdsResponse, onProductClicked: (String) -> Unit) {
 fun TopToolbar(
     badgeNumber: Int,
     onCartClicked: () -> Unit,
-    onProfilClicked: () -> Unit
+    onProfilClicked: () -> Unit,
+    viewModel: MainViewModel
 ) {
-
     TopAppBar(
         backgroundColor = Color.White,
         elevation = 0.dp,
@@ -414,29 +431,220 @@ fun TopToolbar(
             IconButton(onClick = { onProfilClicked.invoke() }) {
                 Icon(Icons.Default.Person, null)
             }
+            IconButton(onClick = { viewModel.showMenu.value = !viewModel.showMenu.value }) {
+                Icon(Icons.Default.MoreVert, null)
+            }
+            DropdownMenu(
+                expanded = viewModel.showMenu.value,
+                onDismissRequest = {  viewModel.toggleShowMenu()  }
+            ) {
+                DropdownMenuItem(onClick = {viewModel.toggleShowSubMenu()}) {
+                    Text(text = stringResource(id = R.string.Choose_language))
+                }
+
+                    RadioGroup(viewModel)
+
+            }
+
         }
     )
 }
 
-//<----------------------------------------------------------------------------------->
 @Composable
-fun Categorybar(CategoryList: List<Pair<String, Int>>, onCategoryClicked: (String) -> Unit) {
-    LazyRow(
-        modifier = Modifier.padding(top = 16.dp),
-        contentPadding = PaddingValues(end = 16.dp)
-    ) {
-        items(CategoryList.size) {
-            CategoryItem(CategoryList[it], onCategoryClicked)
+fun RadioGroup(viewModel: MainViewModel) {
+    val languages = listOf(
+        "English" to R.drawable.britain_flag,
+        "Arabic" to R.drawable.uae_flag,
+        "Farsi" to R.drawable.iran_flag
+    )
+
+    Column {
+        languages.forEachIndexed { index, (language, drawableResId) ->
+            RadioButtonItem(
+                language = language,
+                drawableResId = drawableResId,
+                viewModel = viewModel
+            )
+            if (index<languages.size-1){
+                Divider() // Add a divider between items
+            }
         }
     }
 }
 
 @Composable
-fun CategoryItem(subject: Pair<String, Int>, onCategoryClicked: (String) -> Unit) {
+fun RadioButtonItem(
+    language: String,
+    drawableResId: Int,
+    viewModel: MainViewModel,
+) {
+    val isSelected by viewModel.selectedLanguage.observeAsState()
+    val context = LocalContext.current
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                if (isSelected != language) {
+                    var lang = "en"
+                    when (language) {
+                        "English" -> {
+                            viewModel.setLocation(context, lang)
+                        }
+                        "Arabic" -> {
+                            lang = "ar"
+                            viewModel.setLocation(context, lang)
+                        }
+                        "Farsi" -> {
+                            lang = "fa"
+                            viewModel.setLocation(context, lang)
+                        }
+                    }
+                    viewModel.setSelectedLanguage(lang, context)
+                    // Introduce a delay before toggling the menu visibility
+                    viewModel.toggleShowMenuWithDelay()
+                }
+            }
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        RadioButton(
+            selected = isSelected == (language.take(2).lowercase()), // Use direct comparison
+            modifier = Modifier.size(12.dp),
+            onClick = {
+                if (isSelected != language) {
+                    var lang = "en"
+                    when (language) {
+                        "English" -> {
+                            viewModel.setLocation(context, lang)
+                        }
+                        "Arabic" -> {
+                            lang = "ar"
+                            viewModel.setLocation(context, lang)
+                        }
+                        "Farsi" -> {
+                            lang = "fa"
+                            viewModel.setLocation(context, lang)
+                        }
+                    }
+                    viewModel.setSelectedLanguage(lang, context)
+                    // Introduce a delay before toggling the menu visibility
+                    viewModel.toggleShowMenuWithDelay()
+                }
+            }
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Text(
+            text = language,
+            fontSize = 12.sp,
+            modifier = Modifier.weight(1f)
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Image(
+            painter = painterResource(id = drawableResId),
+            contentDescription = null,
+            modifier = Modifier.size(18.dp)
+        )
+    }
+}
+
+
+//@Composable
+//fun RadioButtonItem(
+//    language: String,
+//    drawableResId: Int,
+//    selectedLanguage: String,
+//    onLanguageSelected: (String) -> Unit
+//) {
+//    val isSelected = language == selectedLanguage
+//    var lang:String
+//    val context = LocalContext.current
+//    Row(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .clickable {
+//                if (!isSelected) {
+//                    onLanguageSelected(language)
+//                    when (language) {
+//                        "English" -> {
+//                            lang="en"
+//                            setLocation(context, lang)
+//                        }
+//                        "Arabic" -> {
+//                            lang="ar"
+//                            setLocation(context, lang)
+//                        }
+//                        "Farsi" -> {
+//                            lang="fa"
+//                            setLocation(context, lang)
+//                        }
+//                    }
+//                }
+//            }
+//            .padding(16.dp),
+//        verticalAlignment = Alignment.CenterVertically
+//    ) {
+//        RadioButton(
+//            selected = isSelected,
+//            modifier = Modifier.size(12.dp),
+//            onClick = {
+//                if (!isSelected) {
+//                    onLanguageSelected(language)
+//                    when (language) {
+//                        "English" -> {
+//                            lang="en"
+//                            setLocation(context, lang)
+//
+//                        }
+//                        "Arabic" -> {
+//                            lang="ar"
+//                            setLocation(context, lang)
+//                        }
+//                        "Farsi" -> {
+//                            lang="fa"
+//                            setLocation(context, lang)
+//                        }
+//                    }
+//                }
+//            }
+//        )
+//        Spacer(modifier = Modifier.width(16.dp))
+//        Text(text = language,
+//            fontSize = 12.sp, // Adjust the size as needed
+//            modifier = Modifier
+//                .weight(1f) // Takes remaining available space
+//            )
+//        Spacer(modifier = Modifier.width(16.dp))
+//        Image(
+//            painter = painterResource(id = drawableResId),
+//            contentDescription = null,
+//            modifier = Modifier.size(18.dp)
+//        )
+//    }
+//}
+
+
+
+//<----------------------------------------------------------------------------------->
+@Composable
+fun Categorybar(CategoryList: List<Pair<Int, Int>>, onCategoryClicked: (String) -> Unit) {
+    LazyRow(
+        modifier = Modifier.padding(top = 16.dp),
+        contentPadding = PaddingValues(end = 16.dp)
+    ) {
+        items(CategoryList) { categoryPair ->
+            CategoryItem(categoryPair, onCategoryClicked)
+        }
+    }
+}
+
+@Composable
+fun CategoryItem(category: Pair<Int, Int>, onCategoryClicked: (String) -> Unit) {
+    val categoryName = stringResource(id = category.first)
     Column(
         modifier = Modifier
             .padding(start = 16.dp)
-            .clickable { onCategoryClicked(subject.first) },
+            .clickable { onCategoryClicked(categoryName) },
         horizontalAlignment = Alignment.CenterHorizontally,
     )
     {
@@ -449,12 +657,12 @@ fun CategoryItem(subject: Pair<String, Int>, onCategoryClicked: (String) -> Unit
                     .padding(16.dp)
                     .size(128.dp)
                     .clip(shape = CircleShape),
-                painter = painterResource(id = subject.second),
+                painter = painterResource(id =  category.second),
                 contentDescription = null,
             )
         }
         Text(
-            text = subject.first,
+            text = categoryName,
             modifier = Modifier.padding(top = 4.dp),
             style = TextStyle(color = Color.Gray)
         )

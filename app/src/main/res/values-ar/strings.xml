@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SupplementsOnlineShopProject</string>
+    <string name="Choose_language">تعیین اللغة</string>
+    <string name="English_language">English</string>
+    <string name="Farsi_language">فارسی</string>
+    <string name="Arabic_language">العربيه</string>
+    <string name="Protein">بروتین</string>
+    <string name="Pre_Workout">تجريب قبل</string>
+    <string name="Creatine">الكرياتين</string>
+    <string name="Boosters">التعزيز</string>
+    <string name="Vitamins">الفيتامينات</string>
+    <string name="Clothing">ملابس</string>
+</resources>

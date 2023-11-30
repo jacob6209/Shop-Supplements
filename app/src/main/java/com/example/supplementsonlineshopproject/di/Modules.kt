@@ -41,7 +41,7 @@ val myModules= module {
     viewModel{SignInViewModel(get())}
     viewModel{ResetPasswordViewModel()}
     viewModel{ CategoryViewModel(get())}
-    viewModel{(isNetConnected:Boolean)->MainViewModel(get(),get(),isNetConnected)}
+    viewModel{(isNetConnected:Boolean)->MainViewModel(get(),get(),isNetConnected,androidContext())}
     viewModel{ProductViewModel(get(),get(),get())}
     viewModel{ ProfileViewModel(get())}
     viewModel{ CartViewModel(get(),get(),get())}

@@ -10,8 +10,11 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -48,23 +51,27 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContent {
+            val configuration = LocalConfiguration.current
+            val context = LocalContext.current
+            CompositionLocalProvider(
+                LocalContext provides context,
+                LocalConfiguration provides configuration
+            ) {
+                Koin(appDeclaration = {
+                    androidContext(this@MainActivity)
+                    modules(myModules)
+                }) {
 
-            Koin(appDeclaration = {
-                androidContext(this@MainActivity)
-                modules(myModules)
-            }) {
-
-                MainAppTheme {
-                    Surface(
-                        color= BackgroundMain,
-                        modifier = Modifier.fillMaxSize()
-                    ){
-                        val userRepository:UserRepository=get()
-                        userRepository.loadToken()
-                        FirebaseMessaging.getInstance().subscribeToTopic("staff_group")
-                        // LaunchedEffect to perform the FCM token retrieval
+                    MainAppTheme {
+                        Surface(
+                            color = BackgroundMain,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            val userRepository: UserRepository = get()
+                            userRepository.loadToken()
+                            FirebaseMessaging.getInstance().subscribeToTopic("staff_group")
+                            // LaunchedEffect to perform the FCM token retrieval
 //                        LaunchedEffect(Unit) {
 //                            val fcmToken = FirebaseMessaging.getInstance().token.await()
 //                            println("FCM Token: $fcmToken")
@@ -72,11 +79,12 @@ class MainActivity : ComponentActivity() {
 //                        }
 //                        ---------
 
-                        SupplementsUi()
+                            SupplementsUi()
+                        }
+
                     }
 
                 }
-
             }
 
         }

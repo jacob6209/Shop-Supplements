@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">SupplementsOnlineShopProject</string>
+    <string name="Choose_language">Language Selection</string>
+    <string name="English_language">English</string>
+    <string name="Farsi_language">فارسی</string>
+    <string name="Arabic_language">العربيه</string>
+    <string name="Protein">Protein</string>
+    <string name="Pre_Workout">Pre_Workout</string>
+    <string name="Creatine">Creatine</string>
+    <string name="Boosters">Boosters</string>
+    <string name="Vitamins">Vitamins</string>
+    <string name="Clothing">Clothing</string>
+
 </resources>

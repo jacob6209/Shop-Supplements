@@ -1,13 +1,16 @@
 package com.example.supplementsonlineshopproject.util
 
 
+import android.app.Activity
+import android.content.Context
+import android.content.res.Configuration
 import android.util.Log
 import android.widget.Toast
 import com.example.supplementsonlineshopproject.model.data.Address
 import kotlinx.coroutines.CoroutineExceptionHandler
 import java.text.SimpleDateFormat
 import java.util.Calendar
-
+import java.util.Locale
 
 
 val coroutinExceptionHandler= CoroutineExceptionHandler { _, throwable ->
@@ -27,10 +30,10 @@ fun stylePrice(oldPrice: String):String{
         if (readyToGo.first() == ','){
             return readyToGo.substring(1)+" Tomans"
         }
-        return readyToGo + " Tomans"
+        return "$readyToGo Tomans"
 
     }
-    return oldPrice + " Tomans"
+    return "$oldPrice Tomans"
 }
 
 
@@ -56,3 +59,23 @@ fun convertAddressListToMap(addressList: List<Address>): Map<String, String> {
     }
     return addressMap
 }
+//fun setLocation(context: Context, lang: String) {
+//    val locale = Locale(lang)
+//    Locale.setDefault(locale)
+//
+//    val config = Configuration()
+//    config.locale = locale
+//
+//    context.resources.updateConfiguration(config, context.resources.displayMetrics)
+//
+//    val editor = context.getSharedPreferences("Settings", Context.MODE_PRIVATE).edit()
+//    editor.putString("My_Lang", lang)
+//    editor.apply()
+//}
+
+//fun loadLocation(context: Context) {
+//    val sharedPreferences = context.getSharedPreferences("Settings", Activity.MODE_PRIVATE)
+//    val language = sharedPreferences.getString("My_Lang", "")
+//    setLocation(context, language!!)
+//}
+

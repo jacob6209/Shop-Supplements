@@ -13,12 +13,12 @@ val EMPTY_PRODUCT=ProductResponse(1,1.5,1,"", emptyList(),"",true,
 
 
 val CATEGORY= listOf(
-    Pair("Protein", R.drawable.protein),
-    Pair("Pre-Workout", R.drawable.pre_workout),
-    Pair("Creatine", R.drawable.creatine),
-    Pair("Boosters", R.drawable.test_boosters),
-    Pair("Vitamins", R.drawable.vitamins_well_ness),
-    Pair("Clothing", R.drawable.workout_clothing),
+    Pair(R.string.Protein, R.drawable.protein),
+    Pair(R.string.Pre_Workout, R.drawable.pre_workout),
+    Pair(R.string.Creatine, R.drawable.creatine),
+    Pair(R.string.Boosters, R.drawable.test_boosters),
+    Pair(R.string.Vitamins, R.drawable.vitamins_well_ness),
+    Pair(R.string.Clothing, R.drawable.workout_clothing),
     )
 
 
