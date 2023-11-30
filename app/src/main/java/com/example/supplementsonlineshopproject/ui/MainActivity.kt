@@ -12,9 +12,12 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -27,6 +30,7 @@ import com.example.supplementsonlineshopproject.ui.features.IntroScreen
 import com.example.supplementsonlineshopproject.ui.features.cart.CartScreen
 import com.example.supplementsonlineshopproject.ui.features.category.CategoryScreen
 import com.example.supplementsonlineshopproject.ui.features.main.MainScreen
+import com.example.supplementsonlineshopproject.ui.features.main.MainViewModel
 import com.example.supplementsonlineshopproject.ui.features.product.ProductScreen
 import com.example.supplementsonlineshopproject.ui.features.profile.ProfileScreen
 import com.example.supplementsonlineshopproject.ui.features.resetPassword.RestPasswordScreen
@@ -52,12 +56,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val configuration = LocalConfiguration.current
-            val context = LocalContext.current
-            CompositionLocalProvider(
-                LocalContext provides context,
-                LocalConfiguration provides configuration
-            ) {
+
                 Koin(appDeclaration = {
                     androidContext(this@MainActivity)
                     modules(myModules)
@@ -85,7 +84,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                 }
-            }
+
 
         }
     }

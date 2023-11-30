@@ -1,5 +1,7 @@
 package com.example.supplementsonlineshopproject.ui.features.main
 
+import android.content.res.Configuration
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -41,15 +43,18 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -115,77 +120,103 @@ fun MainScreen() {
     )
     viewModel.loadLocation(context)  //load Location Setting
 
-    if (NetworkChecker(context).isInternetConnected) {
-        viewModel.loadBadgeNumber()
-    }
-    if (viewModel.getPaymentStatus()== PAYMENT_PENDING){
-        if (NetworkChecker(context).isInternetConnected){
-            viewModel.getCheckoutData()
+    val configuration = LocalConfiguration.current
+    val currentLanguage by viewModel.selectedLanguage.observeAsState()
+    val customConfiguration = remember(currentLanguage) {
+        Configuration().apply {
+            setLocale(
+                when (currentLanguage) {
+                    "ar" -> Locale("ar") // Arabic
+                    "fa" -> Locale("fa") // Farsi
+                    else -> Locale("en") // Default to English if language is not recognized
+                }
+            )
         }
     }
+    Log.v("ConfigProvider","$configuration")
+    CompositionLocalProvider(
+        LocalContext provides context,
+        LocalConfiguration provides customConfiguration
+    ) {
 
-    Scaffold(
-        topBar = {
-            TopToolbar(badgeNumber = viewModel.badgeNumber.value,
-                onCartClicked = {
-                    if (NetworkChecker(context).isInternetConnected){
-                    navigation.navigate(MyScreens.CartScreen.route)
-                    }else{
-                        Toast.makeText(context, "Check Your Internet Connection ", Toast.LENGTH_SHORT).show()
-                    }
-                },
-                onProfilClicked = {
-                    navigation.navigate(MyScreens.ProfileScreen.route)
-                },
-                viewModel = viewModel
+
+        if (NetworkChecker(context).isInternetConnected) {
+            viewModel.loadBadgeNumber()
+        }
+        if (viewModel.getPaymentStatus() == PAYMENT_PENDING) {
+            if (NetworkChecker(context).isInternetConnected) {
+                viewModel.getCheckoutData()
+            }
+        }
+
+        Scaffold(
+            topBar = {
+                TopToolbar(
+                    badgeNumber = viewModel.badgeNumber.value,
+                    onCartClicked = {
+                        if (NetworkChecker(context).isInternetConnected) {
+                            navigation.navigate(MyScreens.CartScreen.route)
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "Check Your Internet Connection ",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    },
+                    onProfilClicked = {
+                        navigation.navigate(MyScreens.ProfileScreen.route)
+                    },
+                    viewModel = viewModel
                 )
-        }
+            }
 
-    ) { innerPadding ->    /* avoid overlapping with the system insets (like the status bar and navigation bar)    */
-        SideEffect {
-            uiController.setStatusBarColor(Color.White)
-        }
-        Box {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(innerPadding)
-                    .padding(bottom = 16.dp)
-            ) {
-                if (viewModel.showProgressBar.value) {
-                    LinearProgressIndicator(
-                        modifier = Modifier.fillMaxWidth(),
-                        color = Blue
-                    )
-                }
-                Categorybar(CATEGORY) {
-                    navigation.navigate(MyScreens.CategoryScreen.route + "/" + it)
-                }
-                val productDataState = viewModel.dataProducts
-                val adsDataState = viewModel.dataAds
+        ) { innerPadding ->    /* avoid overlapping with the system insets (like the status bar and navigation bar)    */
+            SideEffect {
+                uiController.setStatusBarColor(Color.White)
+            }
+            Box {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(innerPadding)
+                        .padding(bottom = 16.dp)
+                ) {
+                    if (viewModel.showProgressBar.value) {
+                        LinearProgressIndicator(
+                            modifier = Modifier.fillMaxWidth(),
+                            color = Blue
+                        )
+                    }
+                    Categorybar(CATEGORY) {
+                        navigation.navigate(MyScreens.CategoryScreen.route + "/" + it)
+                    }
+                    val productDataState = viewModel.dataProducts
+                    val adsDataState = viewModel.dataAds
 
-                ProductSubjectList(TAGS, productDataState.value, adsDataState.value) {
-                    navigation.navigate(MyScreens.ProductScreen.route + "/" + it)
-                }
+                    ProductSubjectList(TAGS, productDataState.value, adsDataState.value) {
+                        navigation.navigate(MyScreens.ProductScreen.route + "/" + it)
+                    }
 //            ProductSubject()
 //            BigPictureTablighat()
 //            ProductSubject()
 //            ProductSubject()
+                }
+
+                if (viewModel.showPaymentDialog.value) {
+                    PaymentResultDialog(
+                        checkoutResult = viewModel.checkoutData.value,
+
+                        onDismiss = {
+                            viewModel.showPaymentDialog.value = false
+                            viewModel.setPaymentStatus(PAYMENT_UNPAID)
+                        }
+                    )
+                }
             }
 
-            if (viewModel.showPaymentDialog.value){
-                PaymentResultDialog(
-                    checkoutResult =viewModel.checkoutData.value,
-
-                    onDismiss = {
-                        viewModel.showPaymentDialog.value=false
-                        viewModel.setPaymentStatus(PAYMENT_UNPAID)
-                    }
-                )
-            }
         }
-
     }
 }
 

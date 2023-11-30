@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "246184199649",
+    "project_id": "supplementsonlineshopproject",
+    "storage_bucket": "supplementsonlineshopproject.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:246184199649:android:92e501f7871f9ccf91fea0",
+        "android_client_info": {
+          "package_name": "com.example.supplementsonlineshopproject"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA4Df8ogsU_06cPxgSH2huAemTRxgdxFr8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
