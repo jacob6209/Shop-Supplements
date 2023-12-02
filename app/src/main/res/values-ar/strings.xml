@@ -5,10 +5,16 @@
     <string name="English_language">English</string>
     <string name="Farsi_language">فارسی</string>
     <string name="Arabic_language">العربيه</string>
+    <!--    /* category-->
     <string name="Protein">بروتین</string>
     <string name="Pre_Workout">تجريب قبل</string>
     <string name="Creatine">الكرياتين</string>
     <string name="Boosters">التعزيز</string>
     <string name="Vitamins">الفيتامينات</string>
     <string name="Clothing">ملابس</string>
+    <!--    /* TAGS-->
+    <string name="Newest">الأحدث</string>
+    <string name="Best_Seller">افضل مبيعا</string>
+    <string name="Most_Visited">أكثر زيارة</string>
+    <string name="Highest_Quality">اعلى جودة</string>
 </resources>

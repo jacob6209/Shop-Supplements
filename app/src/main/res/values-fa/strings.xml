@@ -5,10 +5,16 @@
     <string name="English_language">English</string>
     <string name="Farsi_language">فارسی</string>
     <string name="Arabic_language">العربيه</string>
+    <!--    /* category-->
     <string name="Protein">بروتین</string>
     <string name="Pre_Workout">پیش تمرین</string>
     <string name="Creatine">کراتین</string>
     <string name="Boosters">تقویت کننده ها</string>
     <string name="Vitamins">ویتامین ها</string>
     <string name="Clothing">لباس</string>
+    <!--    /* TAGS-->
+    <string name="Newest">جدیدترین ها</string>
+    <string name="Best_Seller">پر فروش ترین ها</string>
+    <string name="Most_Visited">بیشترین بازدید کننده ها </string>
+    <string name="Highest_Quality">با کیفیت ترین ها</string>
 </resources>

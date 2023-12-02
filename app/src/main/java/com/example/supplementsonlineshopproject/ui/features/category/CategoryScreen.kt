@@ -60,14 +60,13 @@ import kotlin.math.absoluteValue
 fun CategoryScreen(categoryTitle: String) {
     val viewModel = getNavViewModel<CategoryViewModel>()
     viewModel.loadDataByCategory(categoryTitle)
-
     val navigation = getNavController()
     val data = viewModel.dataProducts
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
 
-        CategoryToolBar(categoryName = categoryTitle)
+        CategoryToolBar(categoryName = stringResource(id = getCategoryNameResource(categoryTitle)))
 
         CategoryList(data.value) {
 
@@ -75,6 +74,17 @@ fun CategoryScreen(categoryTitle: String) {
 
         }
     }
+}
+fun getCategoryNameResource(resourceName: String): Int {
+    val categoryNames = mapOf(
+        "Protein" to R.string.Protein,
+        "Pre-Workout" to R.string.Pre_Workout,
+        "Creatine" to R.string.Creatine,
+        "Boosters" to R.string.Boosters,
+        "Vitamins" to R.string.Vitamins,
+        "Clothing" to R.string.Clothing
+    )
+    return categoryNames[resourceName] ?: 0
 }
 
 @OptIn(ExperimentalPagerApi::class)

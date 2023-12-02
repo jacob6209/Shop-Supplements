@@ -4,10 +4,17 @@
     <string name="English_language">English</string>
     <string name="Farsi_language">فارسی</string>
     <string name="Arabic_language">العربيه</string>
+<!--    /* category-->
     <string name="Protein">Protein</string>
-    <string name="Pre_Workout">Pre_Workout</string>
+    <string name="Pre_Workout">Pre-Workout</string>
     <string name="Creatine">Creatine</string>
     <string name="Boosters">Boosters</string>
     <string name="Vitamins">Vitamins</string>
     <string name="Clothing">Clothing</string>
+
+    <!--    /* TAGS-->
+    <string name="Newest">Newest</string>
+    <string name="Best_Seller">Best Seller</string>
+    <string name="Most_Visited">Most Visited</string>
+    <string name="Highest_Quality">Highest Quality</string>
 </resources>
