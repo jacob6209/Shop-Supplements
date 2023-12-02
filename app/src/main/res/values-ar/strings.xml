@@ -5,10 +5,45 @@
     <string name="English_language">English</string>
     <string name="Farsi_language">فارسی</string>
     <string name="Arabic_language">العربيه</string>
+    <!--    /* category-->
     <string name="Protein">بروتین</string>
     <string name="Pre_Workout">تجريب قبل</string>
     <string name="Creatine">الكرياتين</string>
     <string name="Boosters">التعزيز</string>
     <string name="Vitamins">الفيتامينات</string>
     <string name="Clothing">ملابس</string>
+    <!--    /* TAGS-->
+    <string name="Newest">الأحدث</string>
+    <string name="Best_Seller">افضل مبيعا</string>
+    <string name="Most_Visited">أكثر زيارة</string>
+    <string name="Highest_Quality">اعلى جودة</string>
+    <!--    /* Profile Screen-->
+    <string name="First_Name">الاسم</string>
+    <string name="Last_Name">اسم العائلة</string>
+    <string name="Phone_Number">رقم الهاتف</string>
+    <string name="Province">المقاطعة</string>
+    <string name="City">المدنیه</string>
+    <string name="Street">الشارع</string>
+    <string name="Address">العنوان</string>
+    <string name="Postal_Code">رقم بريدي</string>
+    <string name="Email_Address">عنوان البريد الإلكتروني</string>
+    <string name="Login_Time">وقت تسجيل الدخول</string>
+    <string name="Click_Here_to_Add">انقر هنا للاضافه</string>
+    <string name="hope_to_see_you_again">نأمل أن نراكم مرة أخرى :)</string>
+    <string name="Sign_Out">تسجیل الخروج</string>
+    <string name="Profile">حساب تعريفي</string>
+
+    <string name="Add_Location_Data">إضافة بيانات الموقع</string>
+    <string name="First_Name_Dot">الاسم الأول…</string>
+    <string name="Last_Name_Dot">اسم العائلة…</string>
+    <string name="Phone_Number_Dot">رقم الهاتف…</string>
+    <string name="Province_Dot">مقاطعة…</string>
+    <string name="City_Dot">مدينة…</string>
+    <string name="Street_Dot">شارع…</string>
+    <string name="Full_Address_Dot">العنوان الكامل…</string>
+    <string name="Postal_Code_Dot">رمز بريدي…</string>
+    <string name="Save_To_Profile">حفظ في الملف الشخصي</string>
+    <string name="Cancel">الغاء</string>
+    <string name="File_Up_The_Entery">أكمل البیانات من فضلك…</string>
+    <string name="ok">حسنا</string>
 </resources>

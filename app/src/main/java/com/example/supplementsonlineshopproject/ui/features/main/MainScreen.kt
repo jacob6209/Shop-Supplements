@@ -48,7 +48,6 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,23 +55,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
 import com.example.supplementsonlineshopproject.R
 import com.example.supplementsonlineshopproject.model.data.AdsResponse
-import com.example.supplementsonlineshopproject.model.data.CheckOut
 import com.example.supplementsonlineshopproject.model.data.CheckoutOrder
 import com.example.supplementsonlineshopproject.model.data.ProductResponse
-import com.example.supplementsonlineshopproject.ui.features.product.dotSize
 import com.example.supplementsonlineshopproject.ui.theme.BackgroundMain
 import com.example.supplementsonlineshopproject.ui.theme.Blue
 import com.example.supplementsonlineshopproject.ui.theme.CardViewBackgroundItem
@@ -133,8 +131,12 @@ fun MainScreen() {
             )
         }
     }
-    Log.v("ConfigProvider","$configuration")
     CompositionLocalProvider(
+        LocalLayoutDirection provides  if (customConfiguration.locale.language != "en") {
+            LayoutDirection.Rtl
+        } else {
+            LayoutDirection.Ltr
+        },
         LocalContext provides context,
         LocalConfiguration provides customConfiguration
     ) {
@@ -190,18 +192,14 @@ fun MainScreen() {
                         )
                     }
                     Categorybar(CATEGORY) {
-                        navigation.navigate(MyScreens.CategoryScreen.route + "/" + it)
+                        navigation.navigate(MyScreens.CategoryScreen.route + "/" +  it)
                     }
                     val productDataState = viewModel.dataProducts
                     val adsDataState = viewModel.dataAds
 
-                    ProductSubjectList(TAGS, productDataState.value, adsDataState.value) {
+                    ProductSubjectList(TAGS.map { context.getString(it) }, productDataState.value, adsDataState.value) {
                         navigation.navigate(MyScreens.ProductScreen.route + "/" + it)
                     }
-//            ProductSubject()
-//            BigPictureTablighat()
-//            ProductSubject()
-//            ProductSubject()
                 }
 
                 if (viewModel.showPaymentDialog.value) {
@@ -218,6 +216,15 @@ fun MainScreen() {
 
         }
     }
+}
+fun getdirection(customConfiguration:String):String{
+    var config=""
+    when (customConfiguration){
+        "fa"-> config="Rtl"
+        "ar"->config="Rtl"
+        else->config="Ltr"
+    }
+    return config
 }
 
 @Composable
@@ -324,8 +331,15 @@ fun ProductSubjectList(
     val context = LocalContext.current
     if (products.isNotEmpty()) {
         Column {
+            var it_Contener :String=""
             tags.forEachIndexed { it, _ ->
-                val withTagData = products.filter { product -> product.tags == tags[it] }
+                when (it){
+                    0->{it_Contener="Newest"}
+                    1->{it_Contener="Best Seller"}
+                    2->{it_Contener="Most Visited"}
+                    3->{it_Contener="Highest Quality"}
+                }
+                val withTagData = products.filter { product -> product.tags == it_Contener }
                 ProductSubject(tags[it], withTagData.shuffled(), onProductClicked)
                 if (ads.size >= 2)
                     if (it == 1 || it == 2)
@@ -334,7 +348,6 @@ fun ProductSubjectList(
             }
         }
     }
-//    }
 }
 
 
@@ -350,7 +363,8 @@ fun ProductSubject(
         Text(
             text = subject,
             modifier = Modifier.padding(start = 16.dp),
-            style = MaterialTheme.typography.h6
+            style = MaterialTheme.typography.h6,
+            fontWeight = FontWeight.Bold
         )
 
         ProductBar(data, onProductClicked)
@@ -580,82 +594,6 @@ fun RadioButtonItem(
 }
 
 
-//@Composable
-//fun RadioButtonItem(
-//    language: String,
-//    drawableResId: Int,
-//    selectedLanguage: String,
-//    onLanguageSelected: (String) -> Unit
-//) {
-//    val isSelected = language == selectedLanguage
-//    var lang:String
-//    val context = LocalContext.current
-//    Row(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .clickable {
-//                if (!isSelected) {
-//                    onLanguageSelected(language)
-//                    when (language) {
-//                        "English" -> {
-//                            lang="en"
-//                            setLocation(context, lang)
-//                        }
-//                        "Arabic" -> {
-//                            lang="ar"
-//                            setLocation(context, lang)
-//                        }
-//                        "Farsi" -> {
-//                            lang="fa"
-//                            setLocation(context, lang)
-//                        }
-//                    }
-//                }
-//            }
-//            .padding(16.dp),
-//        verticalAlignment = Alignment.CenterVertically
-//    ) {
-//        RadioButton(
-//            selected = isSelected,
-//            modifier = Modifier.size(12.dp),
-//            onClick = {
-//                if (!isSelected) {
-//                    onLanguageSelected(language)
-//                    when (language) {
-//                        "English" -> {
-//                            lang="en"
-//                            setLocation(context, lang)
-//
-//                        }
-//                        "Arabic" -> {
-//                            lang="ar"
-//                            setLocation(context, lang)
-//                        }
-//                        "Farsi" -> {
-//                            lang="fa"
-//                            setLocation(context, lang)
-//                        }
-//                    }
-//                }
-//            }
-//        )
-//        Spacer(modifier = Modifier.width(16.dp))
-//        Text(text = language,
-//            fontSize = 12.sp, // Adjust the size as needed
-//            modifier = Modifier
-//                .weight(1f) // Takes remaining available space
-//            )
-//        Spacer(modifier = Modifier.width(16.dp))
-//        Image(
-//            painter = painterResource(id = drawableResId),
-//            contentDescription = null,
-//            modifier = Modifier.size(18.dp)
-//        )
-//    }
-//}
-
-
-
 //<----------------------------------------------------------------------------------->
 @Composable
 fun Categorybar(CategoryList: List<Pair<Int, Int>>, onCategoryClicked: (String) -> Unit) {
@@ -672,10 +610,11 @@ fun Categorybar(CategoryList: List<Pair<Int, Int>>, onCategoryClicked: (String) 
 @Composable
 fun CategoryItem(category: Pair<Int, Int>, onCategoryClicked: (String) -> Unit) {
     val categoryName = stringResource(id = category.first)
+    val untranslateCategoryName = getCategoryName(category.first)
     Column(
         modifier = Modifier
             .padding(start = 16.dp)
-            .clickable { onCategoryClicked(categoryName) },
+            .clickable { onCategoryClicked(untranslateCategoryName) },
         horizontalAlignment = Alignment.CenterHorizontally,
     )
     {
@@ -699,7 +638,18 @@ fun CategoryItem(category: Pair<Int, Int>, onCategoryClicked: (String) -> Unit) 
         )
     }
 }
+fun getCategoryName(resourceId: Int): String {
+    val categoryNames = mapOf(
+        R.string.Protein to "Protein",
+        R.string.Pre_Workout to "Pre-Workout",
+        R.string.Creatine to "Creatine",
+        R.string.Boosters to "Boosters",
+        R.string.Vitamins to "Vitamins",
+        R.string.Clothing to "Clothing"
+    )
 
+    return categoryNames[resourceId] ?: "Unknown Category"
+}
 
 //@Composable
 //fun DuniCartItem(

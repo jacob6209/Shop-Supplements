@@ -1,6 +1,7 @@
 package com.example.supplementsonlineshopproject.ui.features.profile
 
 
+import android.content.res.Configuration
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -33,9 +34,12 @@ import androidx.compose.material.TextButton
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -43,12 +47,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -57,6 +65,8 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.supplementsonlineshopproject.R
+import com.example.supplementsonlineshopproject.ui.features.main.MainViewModel
+import com.example.supplementsonlineshopproject.ui.features.main.getdirection
 import com.example.supplementsonlineshopproject.ui.theme.Blue
 import com.example.supplementsonlineshopproject.ui.theme.Shapes
 import com.example.supplementsonlineshopproject.util.MyScreens
@@ -66,6 +76,7 @@ import com.example.supplementsonlineshopproject.util.styleTime
 import dev.burnoo.cokoin.navigation.getNavController
 import dev.burnoo.cokoin.navigation.getNavViewModel
 import org.w3c.dom.Text
+import java.util.Locale
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -74,57 +85,127 @@ fun ProfileScreen() {
     val context = LocalContext.current
     val navigation = getNavController()
     val viewModel = getNavViewModel<ProfileViewModel>()
-
+    val MainViewModel = getNavViewModel<MainViewModel>()
 
     viewModel.loadUserData()
 
-    Box {
+    val currentLanguage by MainViewModel.selectedLanguage.observeAsState()
+    val customConfiguration = remember(currentLanguage) {
+        Configuration().apply {
+            setLocale(
+                when (currentLanguage) {
+                    "ar" -> Locale("ar") // Arabic
+                    "fa" -> Locale("fa") // Farsi
+                    else -> Locale("en") // Default to English if language is not recognized
+                }
+            )
+        }
+    }
+    CompositionLocalProvider(
+        LocalLayoutDirection provides if (customConfiguration.locale.language != "en") {
+            LayoutDirection.Rtl
+        } else {
+            LayoutDirection.Ltr
+        },
+        LocalContext provides context,
+        LocalConfiguration provides customConfiguration
+    ) {
+        Box {
 //        part1
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            ProfileToolbar() {
-                navigation.popBackStack()
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                ProfileToolbar() {
+                    navigation.popBackStack()
+
+                }
+                MainAnimation()
+                Spacer(modifier = Modifier.padding(top = 6.dp))
+
+                ShowDataSection(
+                    subject = stringResource(id = R.string.First_Name),
+                    text = viewModel.userFirst_Name.value.takeIf { it.isNotBlank() }
+                        ?: stringResource(id = R.string.Click_Here_to_Add)) {
+                    viewModel.ShowLocationDialog.value = true
+                }
+                ShowDataSection(
+                    subject = stringResource(id = R.string.Last_Name),
+                    text = viewModel.userLast_Name.value.takeIf { it.isNotBlank() }
+                        ?: stringResource(id = R.string.Click_Here_to_Add)) {
+                    viewModel.ShowLocationDialog.value = true
+                }
+                ShowDataSection(
+                    subject = stringResource(id = R.string.Phone_Number),
+                    text = viewModel.userPhone_Number.value.takeIf { it.isNotBlank() }
+                        ?: stringResource(id = R.string.Click_Here_to_Add)) {
+                    viewModel.ShowLocationDialog.value = true
+                }
+                ShowDataSection(
+                    subject = stringResource(id = R.string.Province),
+                    text = viewModel.userProvince.value.takeIf { it.isNotBlank() }
+                        ?: stringResource(id = R.string.Click_Here_to_Add)) {
+                    viewModel.ShowLocationDialog.value = true
+                }
+                ShowDataSection(
+                    subject = stringResource(id = R.string.City),
+                    text = viewModel.userCity.value.takeIf { it.isNotBlank() }
+                        ?: stringResource(id = R.string.Click_Here_to_Add)) {
+                    viewModel.ShowLocationDialog.value = true
+                }
+                ShowDataSection(
+                    subject = stringResource(id = R.string.Street),
+                    text = viewModel.userStreet.value.takeIf { it.isNotBlank() } ?: stringResource(
+                        id = R.string.Click_Here_to_Add
+                    )) { viewModel.ShowLocationDialog.value = true }
+                ShowDataSection(
+                    subject = stringResource(id = R.string.Address),
+                    text = viewModel.address.value.takeIf { it.isNotBlank() }
+                        ?: stringResource(id = R.string.Click_Here_to_Add)) {
+                    viewModel.ShowLocationDialog.value = true
+                }
+                ShowDataSection(
+                    subject = stringResource(id = R.string.Postal_Code),
+                    text = viewModel.postalcode.value.takeIf { it.isNotBlank() } ?: stringResource(
+                        id = R.string.Click_Here_to_Add
+                    )) { viewModel.ShowLocationDialog.value = true }
+                ShowDataSection(
+                    subject = stringResource(id = R.string.Email_Address),
+                    text = viewModel.email.value,
+                    null
+                )
+                ShowDataSection(
+                    subject = stringResource(id = R.string.Login_Time),
+                    text = styleTime(viewModel.loginTime.value.toLong()),
+                    null
+                )
+                Button(
+                    onClick = {
+                        Toast.makeText(context, R.string.hope_to_see_you_again, Toast.LENGTH_SHORT)
+                            .show()
+                        viewModel.signOut()
+                        navigation.navigate(MyScreens.MainScreen.route) {
+                            popUpTo(MyScreens.MainScreen.route) {
+                                inclusive = true
+                            }
+                            navigation.popBackStack()
+                            navigation.popBackStack()
+                        }
+                    }, modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .padding(top = 32.dp)
+                ) { Text(text = stringResource(id = R.string.Sign_Out)) }
 
             }
-            MainAnimation()
-            Spacer(modifier = Modifier.padding(top = 6.dp))
-
-            ShowDataSection(subject = "First Name",text = viewModel.userFirst_Name.value.takeIf { it.isNotBlank() } ?: "Click To add") { viewModel.ShowLocationDialog.value = true }
-            ShowDataSection(subject = "Last Name",text = viewModel.userLast_Name.value.takeIf { it.isNotBlank() } ?: "Click To add") { viewModel.ShowLocationDialog.value = true }
-            ShowDataSection(subject = "Phone Number",text = viewModel.userPhone_Number.value.takeIf { it.isNotBlank() } ?: "Click To add") { viewModel.ShowLocationDialog.value = true }
-            ShowDataSection(subject = "Province",text = viewModel.userProvince.value.takeIf { it.isNotBlank() } ?: "Click To add") { viewModel.ShowLocationDialog.value = true }
-            ShowDataSection(subject = "City",text = viewModel.userCity.value.takeIf { it.isNotBlank() } ?: "Click To add") { viewModel.ShowLocationDialog.value = true }
-            ShowDataSection(subject = "Street",text = viewModel.userStreet.value.takeIf { it.isNotBlank() } ?: "Click To add") { viewModel.ShowLocationDialog.value = true }
-            ShowDataSection(subject = "Address",text = viewModel.address.value.takeIf { it.isNotBlank() } ?: "Click To add") { viewModel.ShowLocationDialog.value = true }
-            ShowDataSection(subject = "Postal Code",text = viewModel.postalcode.value.takeIf { it.isNotBlank() } ?: "Click To add") { viewModel.ShowLocationDialog.value = true }
-            ShowDataSection(subject = "Email Address", text = viewModel.email.value, null)
-            ShowDataSection(subject = "Login Time", text = styleTime(viewModel.loginTime.value.toLong()) , null)
-            Button(onClick = {
-                    Toast.makeText(context, "Hope to see you again :)", Toast.LENGTH_SHORT).show()
-                    viewModel.signOut()
-                    navigation.navigate(MyScreens.MainScreen.route) {
-                        popUpTo(MyScreens.MainScreen.route) {
-                            inclusive = true
-                        }
-                        navigation.popBackStack()
-                        navigation.popBackStack()
-                    }
-                },modifier = Modifier
-                .fillMaxWidth(0.8f)
-                .padding(top = 32.dp)){Text(text = "Sign Out")}
-
-        }
 
 //        part2
-        if (viewModel.ShowLocationDialog.value) {
-            AddUserLocationDataDialog(
-                showSaveLocation = false,
-                onDismiss = { viewModel.ShowLocationDialog.value = false },
-                onSubmitClicked = { address, postalCode, userFirst_name, userlast_name, userPhone_Number, userProvince, userCity, userStreet, _ ->
+            if (viewModel.ShowLocationDialog.value) {
+                AddUserLocationDataDialog(
+                    showSaveLocation = false,
+                    onDismiss = { viewModel.ShowLocationDialog.value = false },
+                    onSubmitClicked = { address, postalCode, userFirst_name, userlast_name, userPhone_Number, userProvince, userCity, userStreet, _ ->
                         viewModel.setUserLocation(
                             address,
                             postalCode,
@@ -135,16 +216,18 @@ fun ProfileScreen() {
                             userCity,
                             userStreet
                         )
-                        
 
-                }
-            )
+
+                    }
+                )
+
+            }
 
         }
 
     }
-}
 
+}
 
 
 @Composable
@@ -178,19 +261,19 @@ fun ShowDataSection(
 fun AddUserLocationDataDialog(
     showSaveLocation: Boolean,
     onDismiss: () -> Unit,
-    onSubmitClicked: (String, String,String,String,String,String,String,String, Boolean) -> Unit
+    onSubmitClicked: (String, String, String, String, String, String, String, String, Boolean) -> Unit
 ) {
 
     val viewModel = getNavViewModel<ProfileViewModel>()
     val context = LocalContext.current
     val checkedState = remember { mutableStateOf(true) }
 
-    val userFirst_name=remember{ mutableStateOf(viewModel.userFirst_Name.value)}
-    val userlast_name=remember{ mutableStateOf(viewModel.userLast_Name.value)}
-    val userPhone_Number=remember{ mutableStateOf(viewModel.userPhone_Number.value)}
-    val userProvince=remember{ mutableStateOf(viewModel.userProvince.value)}
-    val userCity=remember{ mutableStateOf(viewModel.userCity.value)}
-    val userStreet=remember{ mutableStateOf(viewModel.userStreet.value)}
+    val userFirst_name = remember { mutableStateOf(viewModel.userFirst_Name.value) }
+    val userlast_name = remember { mutableStateOf(viewModel.userLast_Name.value) }
+    val userPhone_Number = remember { mutableStateOf(viewModel.userPhone_Number.value) }
+    val userProvince = remember { mutableStateOf(viewModel.userProvince.value) }
+    val userCity = remember { mutableStateOf(viewModel.userCity.value) }
+    val userStreet = remember { mutableStateOf(viewModel.userStreet.value) }
     val userAddress = remember { mutableStateOf(viewModel.address.value) }
     val userPostalCode = remember { mutableStateOf(viewModel.postalcode.value) }
 
@@ -213,10 +296,10 @@ fun AddUserLocationDataDialog(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceAround,
 
-            ) {
+                ) {
 
                 Text(
-                    text = "Add Location Data",
+                    text = stringResource(id = R.string.Add_Location_Data),
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
@@ -226,28 +309,44 @@ fun AddUserLocationDataDialog(
                 )
                 Spacer(modifier = Modifier.height(2.dp))
 
-                MainTextField(userFirst_name.value,"First Name...",isError = userFirst_name.value.isBlank(),) {
+                MainTextField(
+                    userFirst_name.value,
+                    stringResource(id = R.string.First_Name_Dot),
+                    isError = userFirst_name.value.isBlank()
+                ) {
                     userFirst_name.value = it
                 }
-                MainTextField(userlast_name.value,"Last Name...",isError = userlast_name.value.isBlank(),) {
+                MainTextField(
+                    userlast_name.value,
+                    stringResource(id = R.string.Last_Name_Dot),
+                    isError = userlast_name.value.isBlank(),
+                ) {
                     userlast_name.value = it
                 }
-                MainTextField(userPhone_Number.value,"Phone Number...",isError = userPhone_Number.value.isBlank(),) {
+                MainTextField(
+                    userPhone_Number.value,
+                    stringResource(id = R.string.Phone_Number_Dot),
+                    isError = userPhone_Number.value.isBlank(),
+                ) {
                     userPhone_Number.value = it
                 }
-                MainTextField(userProvince.value,"Province...",userProvince.value.isBlank()) {
+                MainTextField(userProvince.value, stringResource(id = R.string.Province_Dot), userProvince.value.isBlank()) {
                     userProvince.value = it
                 }
-                MainTextField(userCity.value,"City...",userCity.value.isBlank()) {
+                MainTextField(userCity.value, stringResource(id = R.string.City_Dot), userCity.value.isBlank()) {
                     userCity.value = it
                 }
-                MainTextField(userStreet.value,"Street...",userStreet.value.isBlank()) {
+                MainTextField(userStreet.value, stringResource(id = R.string.Street_Dot), userStreet.value.isBlank()) {
                     userStreet.value = it
                 }
-                MainTextField(userAddress.value,"Full Address...",userAddress.value.isBlank()) {
+                MainTextField(userAddress.value, stringResource(id = R.string.Full_Address_Dot), userAddress.value.isBlank()) {
                     userAddress.value = it
                 }
-                MainTextField(userPostalCode.value,"Postal Code...",userPostalCode.value.isBlank()) {
+                MainTextField(
+                    userPostalCode.value,
+                    stringResource(id = R.string.Postal_Code_Dot),
+                    userPostalCode.value.isBlank()
+                ) {
                     userPostalCode.value = it
                 }
 
@@ -265,7 +364,7 @@ fun AddUserLocationDataDialog(
                             onCheckedChange = { checkedState.value = it },
                         )
 
-                        Text(text = "Save To Profile")
+                        Text(text = stringResource(id = R.string.Save_To_Profile))
 
                     }
 
@@ -279,7 +378,7 @@ fun AddUserLocationDataDialog(
                 ) {
 
                     TextButton(onClick = onDismiss) {
-                        Text(text = "Cancel")
+                        Text(text = stringResource(id =R.string.Cancel) )
                     }
                     Spacer(modifier = Modifier.width(4.dp))
                     TextButton(onClick = {
@@ -290,7 +389,7 @@ fun AddUserLocationDataDialog(
                             (userPhone_Number.value.isNotBlank()) &&
                             (userProvince.value.isNotBlank()) &&
                             (userCity.value.isNotBlank()) &&
-                            (userStreet.value.isNotBlank())&&
+                            (userStreet.value.isNotBlank()) &&
                             (userAddress.value.isNotBlank()) &&
                             (userPostalCode.value.isNotBlank())
                         ) {
@@ -307,20 +406,23 @@ fun AddUserLocationDataDialog(
                             )
                             onDismiss.invoke()
                         } else {
-                            Toast.makeText(context, "Fill up the entries please...", Toast.LENGTH_SHORT)
+                            Toast.makeText(
+                                context,
+                                R.string.File_Up_The_Entery,
+                                Toast.LENGTH_SHORT
+                            )
                                 .show()
                         }
 
 
                     }) {
-                        Text(text = "Ok")
+                        Text(text = stringResource(id =R.string.ok ))
                     }
                 }
             }
         }
     }
 }
-
 
 
 @Composable
@@ -341,10 +443,13 @@ fun MainAnimation() {
 fun ProfileToolbar(
     onBackClick: () -> Unit
 ) {
+    val layoutDirection = LocalLayoutDirection.current
+    val isRtl = layoutDirection == LayoutDirection.Rtl
+
     TopAppBar(
         navigationIcon = {
             IconButton(onClick = { onBackClick.invoke() }) {
-                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
+                Icon(imageVector =if (isRtl)  Icons.Default.ArrowForward else  Icons.Default.ArrowBack, contentDescription = null)
             }
         },
         elevation = 2.dp,
@@ -352,7 +457,7 @@ fun ProfileToolbar(
         modifier = Modifier.fillMaxWidth(),
         title = {
             Text(
-                text = "My Profile",
+                text = stringResource(id = R.string.Profile),
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -371,11 +476,16 @@ fun MainTextField(
 ) {
     OutlinedTextField(
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-        label = {Text(text=hint,color = if (isError) Color.Red else LocalContentColor.current)},
+        label = {
+            Text(
+                text = hint,
+                color = if (isError) Color.Red else LocalContentColor.current
+            )
+        },
         value = edtValue,
         singleLine = true,
         onValueChange = onValueChange,
-        placeholder = {Text(hint)},
+        placeholder = { Text(hint) },
         modifier = Modifier
             .fillMaxWidth(0.9f)
             .padding(top = 12.dp),
@@ -383,6 +493,7 @@ fun MainTextField(
         isError = isError
     )
 }
+
 
 
 

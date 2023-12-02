@@ -4,10 +4,50 @@
     <string name="English_language">English</string>
     <string name="Farsi_language">فارسی</string>
     <string name="Arabic_language">العربيه</string>
+<!--    /* category-->
     <string name="Protein">Protein</string>
-    <string name="Pre_Workout">Pre_Workout</string>
+    <string name="Pre_Workout">Pre-Workout</string>
     <string name="Creatine">Creatine</string>
     <string name="Boosters">Boosters</string>
     <string name="Vitamins">Vitamins</string>
     <string name="Clothing">Clothing</string>
+
+    <!--    /* TAGS-->
+    <string name="Newest">Newest</string>
+    <string name="Best_Seller">Best Seller</string>
+    <string name="Most_Visited">Most Visited</string>
+    <string name="Highest_Quality">Highest Quality</string>
+
+    <!--    /* Profile Screen-->
+    <string name="First_Name">First Name</string>
+    <string name="Last_Name">Last Name</string>
+    <string name="Phone_Number">Phone Number</string>
+    <string name="Province">Province</string>
+    <string name="City">City</string>
+    <string name="Street">Street</string>
+    <string name="Address">Address</string>
+    <string name="Postal_Code">Postal Code</string>
+    <string name="Email_Address">Email Address</string>
+    <string name="Login_Time">Login Time</string>
+    <string name="Click_Here_to_Add">Click here to add</string>
+    <string name="hope_to_see_you_again">Hope to see you again :)</string>
+    <string name="Sign_Out">Sign Out</string>
+    <string name="Profile">Profile</string>
+    <string name="Add_Location_Data">Add Location Data</string>
+
+    <string name="First_Name_Dot">First Name…</string>
+    <string name="Last_Name_Dot">Last Name…</string>
+    <string name="Phone_Number_Dot">Phone Number…</string>
+    <string name="Province_Dot">Province…</string>
+    <string name="City_Dot">City…</string>
+    <string name="Street_Dot">Street…</string>
+    <string name="Full_Address_Dot">Full Address…</string>
+    <string name="Postal_Code_Dot">Postal Code…</string>
+    <string name="Save_To_Profile">Save To Profile</string>
+    <string name="Cancel">Cancel</string>
+    <string name="File_Up_The_Entery">Fill up the entries please…</string>
+    <string name="ok">ok</string>
+
+
+
 </resources>
