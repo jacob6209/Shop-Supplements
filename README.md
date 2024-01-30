@@ -1,6 +1,4 @@
 # Online Supplement Shop
-
-[![Build Status](your_build_status_badge_url)](link_to_build_status)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](link_to_license)
 
 ## Overview
@@ -19,7 +17,8 @@ The Online Supplement Shop is a project designed to provide a seamless and effic
 - **Django Backend API:** Utilizes Django for the backend API, providing a powerful and scalable server-side solution.
 
 ## Getting Started
-
 1. **Clone the Repository:**
    ```bash
    git clone https://github.com/jacob6209/Shop-Supplements.git
+2. **Clone the Repository For API:**
+   https://github.com/jacob6209/OnlineShopSupplement_DRF.git
