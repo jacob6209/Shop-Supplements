@@ -47,7 +47,10 @@ class MainViewModel(
 
     fun toggleShowMenuWithDelay() {
         viewModelScope.launch {
+            // Introduce a delay of 0.5 second (you can adjust this value)
             toggleShowMenu()
+//            delay(500)
+//            toggleShowMenu()
         }
     }
 

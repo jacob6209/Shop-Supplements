@@ -17,33 +17,4 @@
     <string name="Best_Seller">پر فروش ترین ها</string>
     <string name="Most_Visited">بیشترین بازدید کننده ها </string>
     <string name="Highest_Quality">با کیفیت ترین ها</string>
-    <!--    /* Profile Screen-->
-    <string name="First_Name">نام</string>
-    <string name="Last_Name">نام خانوادگی</string>
-    <string name="Phone_Number">شماره همراه</string>
-    <string name="Province">استان</string>
-    <string name="City">شهر</string>
-    <string name="Street">خیابان</string>
-    <string name="Address">آدرس</string>
-    <string name="Postal_Code">کد پستی</string>
-    <string name="Email_Address">ایمیل الکترونیکی</string>
-    <string name="Login_Time">زمان ورود </string>
-    <string name="Click_Here_to_Add">برای افزودن اینجا کلیک کنید</string>
-    <string name="hope_to_see_you_again">به امید دیدار مجدد :) </string>
-    <string name="Sign_Out">خروج از سیستم</string>
-    <string name="Profile">پروفایل</string>
-
-    <string name="Add_Location_Data">اضافه كردن آدرس </string>
-    <string name="First_Name_Dot">نام…</string>
-    <string name="Last_Name_Dot">نام خانوادگی…</string>
-    <string name="Phone_Number_Dot">شماره همراه…</string>
-    <string name="Province_Dot">استان…</string>
-    <string name="City_Dot">شهر…</string>
-    <string name="Street_Dot">خیابان…</string>
-    <string name="Full_Address_Dot">آدرس…</string>
-    <string name="Postal_Code_Dot">کد پستی…</string>
-    <string name="Save_To_Profile">ذخیره در پروفایل</string>
-    <string name="Cancel">لغو</string>
-    <string name="File_Up_The_Entery">لطفا ورودی ها را پر کنید…</string>
-    <string name="ok">باشه</string>
 </resources>
