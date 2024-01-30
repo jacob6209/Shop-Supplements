@@ -21,4 +21,5 @@ The Online Supplement Shop is a project designed to provide a seamless and effic
    ```bash
    git clone https://github.com/jacob6209/Shop-Supplements.git
 2. **Clone the Repository For API:**
+   ```bash
    https://github.com/jacob6209/OnlineShopSupplement_DRF.git
