@@ -15,7 +15,7 @@ The Online Supplement Shop is a project designed to provide a seamless and effic
 - **Koin:** Implements Koin for dependency injection, making the codebase more modular and testable.
 - **Jetpack Compose:** Leverages Jetpack Compose for building the UI, creating a modern and declarative approach to UI development.
 - **Django Backend API:** Utilizes Django for the backend API, providing a powerful and scalable server-side solution.
-## App Envirement
+## App ScreenShot
 ![App Screenshot 1](app/src/main/java/com/example/supplementsonlineshopproject/screenshotApp/1.jpeg)
 ![App Screenshot 1](app/src/main/java/com/example/supplementsonlineshopproject/screenshotApp/2.jpeg)
 ## Getting Started
